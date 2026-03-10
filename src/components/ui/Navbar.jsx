@@ -101,8 +101,8 @@ const Navbar = () => {
                   <Link
                     to={item.path}
                     className={`px-5 py-2 rounded-full text-[11px] font-medium tracking-[0.2em] transition-all duration-300 uppercase ${hoveredItem === item.path
-                        ? 'bg-[#3F96FC] text-white shadow-lg shadow-[#3F96FC]/20'
-                        : 'text-gray-500 dark:text-gray-400 hover:text-[#3F96FC] dark:hover:text-[#3F96FC]'
+                      ? 'bg-[#3F96FC] text-white shadow-lg shadow-[#3F96FC]/20'
+                      : 'text-gray-500 dark:text-gray-400 hover:text-[#3F96FC] dark:hover:text-[#3F96FC]'
                       }`}
                   >
                     {item.name}
@@ -185,7 +185,7 @@ const Navbar = () => {
                     </div>
 
                     <div className="p-3">
-                      {profile?.role === 'admin' && (
+                      {profile?.role === 'admin' ? (
                         <Link
                           to="/admin/dashboard"
                           onClick={() => setProfileMenuOpen(false)}
@@ -194,15 +194,16 @@ const Navbar = () => {
                           <UserCircleIcon className="w-4 h-4 mr-3 opacity-50" />
                           Admin Panel
                         </Link>
+                      ) : (
+                        <Link
+                          to="/profile"
+                          onClick={() => setProfileMenuOpen(false)}
+                          className="flex items-center px-4 py-3 rounded-2xl text-[11px] font-medium tracking-[0.2em] text-gray-500 uppercase hover:bg-gray-50 dark:hover:bg-white/5 hover:text-black dark:hover:text-white transition-colors"
+                        >
+                          <UserCircleIcon className="w-4 h-4 mr-3 opacity-50" />
+                          Mi Cuenta
+                        </Link>
                       )}
-                      <Link
-                        to="/profile"
-                        onClick={() => setProfileMenuOpen(false)}
-                        className="flex items-center px-4 py-3 rounded-2xl text-[11px] font-medium tracking-[0.2em] text-gray-500 uppercase hover:bg-gray-50 dark:hover:bg-white/5 hover:text-black dark:hover:text-white transition-colors"
-                      >
-                        <UserCircleIcon className="w-4 h-4 mr-3 opacity-50" />
-                        Mi Cuenta
-                      </Link>
                       <button
                         onClick={() => {
                           logout();
@@ -304,10 +305,11 @@ const Navbar = () => {
                   </div>
                 </div>
 
-                {profile?.role === 'admin' && (
+                {profile?.role === 'admin' ? (
                   <Link to="/admin/dashboard" onClick={toggleMenu} className="text-sm font-light tracking-widest text-[#3F96FC] uppercase">Panel Admin</Link>
+                ) : (
+                  <Link to="/profile" onClick={toggleMenu} className="text-sm font-light tracking-widest text-black dark:text-white uppercase">Mi Perfil</Link>
                 )}
-                <Link to="/profile" onClick={toggleMenu} className="text-sm font-light tracking-widest text-black dark:text-white uppercase">Mi Perfil</Link>
                 <button onClick={() => { logout(); toggleMenu(); }} className="text-left text-sm font-light tracking-widest text-[#FF854D] uppercase">Cerrar Sesión</button>
               </div>
             ) : (
