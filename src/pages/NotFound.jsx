@@ -147,7 +147,7 @@ export default function NotFound() {
         <div className="mt-12 text-gray-600 dark:text-gray-300 animate-fade-in">
           <p>¿Necesitas ayuda? Contáctanos en</p>
           <a href="mailto:soporte@jerzystore.com" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium">
-            soporte@jerzystore.com
+            yersiman.solution@gmail.com
           </a>
         </div>
       </div>

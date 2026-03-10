@@ -1,236 +1,262 @@
-import { useState, useEffect } from 'react';
-import { 
-  UserGroupIcon,
-  SparklesIcon
-} from '@heroicons/react/24/outline';
+import { ComputerDesktopIcon, ShieldCheckIcon, LightBulbIcon, TruckIcon } from '@heroicons/react/24/outline';
+import { useTheme } from '../context/ThemeContext';
+import LoadingSpinner from '../components/ui/LoadingSpinner';
+import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { aboutService } from '../services/aboutService';
 
 const About = () => {
-  const [settings, setSettings] = useState(null);
+  const { darkMode } = useTheme();
+  const [content, setContent] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchSettings = async () => {
+    const loadContent = async () => {
       try {
-        const data = await settingsService.getSiteSettings();
-        setSettings(data);
-      } catch (err) {
-        setError(err.message);
+        setLoading(true);
+        const data = await aboutService.getAboutContent();
+        if (data) {
+          setContent(data.content);
+        }
+      } catch (error) {
+        console.error('Error loading about content:', error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchSettings();
+    loadContent();
+
+    // Suscripción a cambios en tiempo real
+    const subscription = aboutService.subscribeToChanges((payload) => {
+      if (payload.eventType === 'UPDATE' || payload.eventType === 'INSERT') {
+        setContent(payload.new.content);
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
-  if (loading) {
+  if (loading) return (
+    <div className={`flex items-center justify-center min-h-[60vh] ${darkMode ? 'bg-[#121212]' : 'bg-white'}`}>
+      <LoadingSpinner size="lg" />
+    </div>
+  );
+
+  // Si hay contenido en la base de datos, lo mostramos
+  if (content) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 rounded w-1/4 mb-4"></div>
-          <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-          <div className="h-4 bg-gray-200 rounded w-2/3"></div>
-        </div>
-      </div>
+      <div 
+        className={`min-h-screen ${darkMode ? 'bg-[#121212]' : 'bg-white'}`}
+        dangerouslySetInnerHTML={{ __html: content }}
+      />
     );
   }
 
-  if (error) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="bg-red-50 p-4 rounded-lg">
-          <p className="text-red-800">{error}</p>
-        </div>
-      </div>
-    );
-  }
-
-  const team = [
-    {
-      name: 'Juan Pérez',
-      role: 'Fundador & CEO',
-      bio: 'Con más de 15 años de experiencia en tecnología y servicios técnicos.',
-      image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'
-    },
-    {
-      name: 'María García',
-      role: 'Directora Técnica',
-      bio: 'Especialista en sistemas y redes con certificaciones internacionales.',
-      image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'
-    },
-    {
-      name: 'Carlos López',
-      role: 'Supervisor de Servicios',
-      bio: 'Experto en mantenimiento y reparación de equipos.',
-      image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'
-    }
-  ];
-
+  // Si no hay contenido en la base de datos, mostramos el contenido estático
   const values = [
     {
-      icon: UserGroupIcon,
-      title: 'Nuestro Equipo',
-      description: 'Un grupo diverso de profesionales apasionados por brindar el mejor servicio.'
+      icon: ComputerDesktopIcon,
+      title: 'Tecnología de Vanguardia',
+      description: 'Ofrecemos los equipos más modernos y potentes del mercado'
     },
     {
-      icon: TrophyIcon,
-      title: 'Excelencia',
-      description: 'Nos esforzamos por mantener los más altos estándares en todo lo que hacemos.'
+      icon: ShieldCheckIcon,
+      title: 'Calidad Garantizada',
+      description: 'Todos nuestros productos cuentan con garantía y soporte técnico'
     },
     {
-      icon: HeartIcon,
-      title: 'Compromiso',
-      description: 'Dedicados a satisfacer las necesidades de nuestros clientes.'
+      icon: LightBulbIcon,
+      title: 'Asesoría Personalizada',
+      description: 'Te ayudamos a encontrar el equipo perfecto para tus necesidades'
     },
     {
-      icon: SparklesIcon,
-      title: 'Innovación',
-      description: 'Constantemente buscamos nuevas formas de mejorar y crecer.'
+      icon: TruckIcon,
+      title: 'Entrega Rápida',
+      description: 'Envíos seguros y rápidos a todo el país'
     }
   ];
 
-  const stats = [
-    { name: 'Años de experiencia', value: '10+' },
-    { name: 'Clientes satisfechos', value: '1000+' },
-    { name: 'Servicios completados', value: '5000+' },
-    { name: 'Técnicos certificados', value: '15+' }
+  // Equipo reducido (empresa nueva)
+  const team = [
+    {
+      name: 'Miguel Torres',
+      role: 'Fundador & CEO',
+      bio: 'Apasionado por la tecnología y con visión de revolucionar el mercado',
+    },
+    {
+      name: 'Laura Gómez',
+      role: 'Especialista en Ventas',
+      bio: 'Experta en asesoría técnica y atención al cliente',
+    }
   ];
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="max-w-7xl mx-auto">
-        {/* Hero Section */}
+    <div className={`min-h-screen ${darkMode ? 'bg-[#121212] text-gray-400' : 'bg-white text-gray-600'} transition-colors duration-300 font-light`}>
+      <div className="container mx-auto px-4 py-12">
+        {/* Sección Principal */}
         <div className="text-center mb-16">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Acerca de JerzyStore
+          <h1 className={`text-4xl tracking-tighter mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+            <span className="font-light">Sobre</span> <span className="font-semibold">nosotros</span>
           </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Somos una tienda comprometida con la calidad y la satisfacción del cliente.
-            Nuestra misión es proporcionar productos excepcionales y un servicio impecable.
+          <div className="flex items-center justify-center space-x-2 mb-8">
+            <div className="h-[1px] w-8 bg-gray-200 dark:bg-gray-800"></div>
+            <div className="h-1 w-1 rounded-full bg-[#3F96FC]"></div>
+            <div className="h-[1px] w-8 bg-gray-200 dark:bg-gray-800"></div>
+          </div>
+          <p className="text-lg max-w-2xl mx-auto opacity-70 leading-relaxed">
+            Tu destino tecnológico: equipos de alta calidad, servicio personalizado y precios competitivos.
           </p>
         </div>
 
-        {/* Valores */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
-          {values.map((value, index) => (
-            <div key={index} className="bg-white rounded-lg shadow-sm p-6 text-center">
-              <value.icon className="h-12 w-12 text-indigo-600 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">{value.title}</h3>
-              <p className="text-gray-600">{value.description}</p>
+        {/* Nuestra Historia */}
+        <div className={`rounded-3xl overflow-hidden border border-gray-100 dark:border-gray-800 mb-20 ${darkMode ? 'bg-[#1E1E1E]' : 'bg-white'}`}>
+          <div className="grid md:grid-cols-2">
+            <div className="p-10 lg:p-16 flex items-center">
+              <div>
+                <h2 className={`text-2xl font-light tracking-tight mb-8 ${darkMode ? 'text-white' : 'text-gray-900'}`}>Nuestra historia</h2>
+                <div className="space-y-6 opacity-80 leading-relaxed">
+                  <p>
+                    Nacimos con una visión clara: hacer que la tecnología de alta calidad sea accesible para todos.
+                    Fundada en 2025, TechStore surge como respuesta a un mercado que necesitaba un enfoque más
+                    personalizado y cercano.
+                  </p>
+                  <p>
+                    Aunque somos nuevos en el mercado, nuestro equipo cuenta con amplia experiencia en el sector
+                    tecnológico y una pasión compartida por ofrecer el mejor servicio y los mejores productos.
+                  </p>
+                </div>
+              </div>
             </div>
-          ))}
-        </div>
-
-        {/* Historia */}
-        <div className="bg-white rounded-lg shadow-sm p-8 mb-16">
-          <h2 className="text-3xl font-bold text-gray-900 mb-6">Nuestra Historia</h2>
-          <div className="prose max-w-none">
-            <p className="text-gray-600 mb-4">
-              JerzyStore nació de la visión de crear una tienda que combine la conveniencia
-              del comercio electrónico con la calidad y el servicio personalizado de una
-              tienda tradicional.
-            </p>
-            <p className="text-gray-600 mb-4">
-              Desde nuestros inicios, nos hemos enfocado en seleccionar cuidadosamente
-              cada producto que ofrecemos, asegurándonos de que cumpla con nuestros
-              altos estándares de calidad.
-            </p>
-            <p className="text-gray-600">
-              Hoy, seguimos creciendo y evolucionando, siempre manteniendo nuestro
-              compromiso con la excelencia y la satisfacción del cliente.
-            </p>
+            <div className="bg-[#37383F] flex items-center justify-center p-12">
+              <div className="text-white text-center">
+                <h3 className="text-[10px] tracking-[0.3em] uppercase mb-6 opacity-60">Nuestra Misión</h3>
+                <p className="text-xl font-light leading-relaxed">
+                  Proporcionar soluciones tecnológicas innovadoras y accesibles, con un servicio excepcional que supere
+                  las expectativas de nuestros clientes.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Estadísticas */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="bg-white rounded-lg shadow-sm p-6 text-center">
-            <div className="text-4xl font-bold text-indigo-600 mb-2">1000+</div>
-            <div className="text-gray-600">Clientes Satisfechos</div>
-          </div>
-          <div className="bg-white rounded-lg shadow-sm p-6 text-center">
-            <div className="text-4xl font-bold text-indigo-600 mb-2">500+</div>
-            <div className="text-gray-600">Productos</div>
-          </div>
-          <div className="bg-white rounded-lg shadow-sm p-6 text-center">
-            <div className="text-4xl font-bold text-indigo-600 mb-2">50+</div>
-            <div className="text-gray-600">Marcas Colaboradoras</div>
+        {/* Valores */}
+        <div className="mb-16">
+          <h2 className={`text-3xl font-bold text-center mb-12 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+            Nuestros Valores
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {values.map((value, index) => (
+              <div 
+                key={index} 
+                className={`rounded-2xl p-8 border border-transparent transition-all hover:border-gray-100 dark:hover:border-gray-800 ${
+                  darkMode ? 'bg-[#1E1E1E]' : 'bg-white'
+                }`}
+              >
+                <div className="mb-6">
+                  <value.icon className={`h-8 w-8 ${darkMode ? 'text-[#3F96FC]' : 'text-[#3F96FC]'} opacity-80`} />
+                </div>
+                <h3 className={`text-sm font-medium tracking-wide uppercase mb-3 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                  {value.title}
+                </h3>
+                <p className="text-sm opacity-70 leading-relaxed">
+                  {value.description}
+                </p>
+              </div>
+            ))}
           </div>
         </div>
 
         {/* Equipo */}
-        <div className="bg-white">
-          <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8 lg:py-24">
-            <div className="space-y-12">
-              <div className="space-y-5 sm:mx-auto sm:max-w-xl sm:space-y-4 lg:max-w-5xl">
-                <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Nuestro equipo</h2>
-                <p className="text-xl text-gray-500">
-                  Conoce a las personas detrás de nuestro éxito.
+        <div className={`rounded-3xl ${darkMode ? 'bg-[#1E1E1E]' : 'bg-white'} border border-gray-100 dark:border-gray-800 p-12 mb-20`}>
+          <h2 className={`text-2xl font-light tracking-tight text-center mb-16 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+            Nuestro equipo
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-16 max-w-3xl mx-auto">
+            {team.map((person) => (
+              <div key={person.name} className="group">
+                <div className={`w-20 h-20 rounded-full mb-6 ${darkMode ? 'bg-gray-800' : 'bg-gray-50'} flex items-center justify-center grayscale group-hover:grayscale-0 transition-all border border-gray-100 dark:border-gray-800`}>
+                  <span className={`text-2xl font-light ${darkMode ? 'text-gray-600' : 'text-gray-400'}`}>
+                    {person.name.charAt(0)}
+                  </span>
+                </div>
+                <h3 className={`text-base font-medium ${darkMode ? 'text-white' : 'text-gray-900'}`}>{person.name}</h3>
+                <p className="text-xs text-[#3F96FC] font-medium tracking-widest uppercase mt-1 mb-4">{person.role}</p>
+                <p className="text-sm opacity-60 italic leading-relaxed">"{person.bio}"</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Por qué elegirnos */}
+        <div className={`rounded-3xl border border-gray-100 dark:border-gray-800 mb-20 ${darkMode ? 'bg-[#1E1E1E]' : 'bg-gray-50'}`}>
+          <div className="p-10 lg:p-16">
+            <h2 className={`text-2xl font-light tracking-tight text-center mb-12 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+              ¿Por qué elegirnos?
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+              <div className="space-y-2">
+                <h3 className={`text-sm font-medium tracking-wide uppercase ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                  Atención Personalizada
+                </h3>
+                <p className="text-sm opacity-70 leading-relaxed">
+                  No somos solo vendedores, somos asesores tecnológicos. Analizamos tus necesidades para recomendarte el equipo ideal para ti.
                 </p>
               </div>
-              <ul className="mx-auto space-y-16 sm:grid sm:grid-cols-2 sm:gap-16 sm:space-y-0 lg:max-w-5xl lg:grid-cols-3">
-                {team.map((person) => (
-                  <li key={person.name}>
-                    <div className="space-y-6">
-                      <img className="mx-auto h-40 w-40 rounded-full xl:w-56 xl:h-56" src={person.image} alt="" />
-                      <div className="space-y-2">
-                        <div className="text-lg leading-6 font-medium space-y-1">
-                          <h3>{person.name}</h3>
-                          <p className="text-blue-600">{person.role}</p>
-                        </div>
-                        <ul className="flex justify-center space-x-5">
-                          <li>
-                            <a href="#" className="text-gray-400 hover:text-gray-500">
-                              <span className="sr-only">Twitter</span>
-                              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                                <path d="M6.29 18.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0020 3.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.073 4.073 0 01.8 7.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 010 16.407a11.616 11.616 0 006.29 1.84" />
-                              </svg>
-                            </a>
-                          </li>
-                          <li>
-                            <a href="#" className="text-gray-400 hover:text-gray-500">
-                              <span className="sr-only">LinkedIn</span>
-                              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                                <path fillRule="evenodd" d="M16.338 16.338H13.67V12.16c0-.995-.017-2.277-1.387-2.277-1.39 0-1.601 1.086-1.601 2.207v4.248H8.014v-8.59h2.559v1.174h.037c.356-.675 1.227-1.387 2.526-1.387 2.703 0 3.203 1.778 3.203 4.092v4.711zM5.005 6.575a1.548 1.548 0 11-.003-3.096 1.548 1.548 0 01.003 3.096zm-1.337 9.763H6.34v-8.59H3.667v8.59zM17.668 1H2.328C1.595 1 1 1.581 1 2.298v15.403C1 18.418 1.595 19 2.328 19h15.34c.734 0 1.332-.582 1.332-1.299V2.298C19 1.581 18.402 1 17.668 1z" clipRule="evenodd" />
-                              </svg>
-                            </a>
-                          </li>
-                        </ul>
-                      </div>
-                    </div>
-                  </li>
-                ))}
-              </ul>
+              <div className="space-y-2">
+                <h3 className={`text-sm font-medium tracking-wide uppercase ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                  Productos Seleccionados
+                </h3>
+                <p className="text-sm opacity-70 leading-relaxed">
+                  Cada producto en nuestro catálogo ha sido cuidadosamente seleccionado por su calidad, rendimiento y durabilidad.
+                </p>
+              </div>
+              <div className="space-y-2">
+                <h3 className={`text-sm font-medium tracking-wide uppercase ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                  Servicio Post-Venta
+                </h3>
+                <p className="text-sm opacity-70 leading-relaxed">
+                  Nuestro compromiso no termina con la venta. Te ofrecemos soporte técnico y servicio post-venta para resolver cualquier inquietud.
+                </p>
+              </div>
+              <div className="space-y-2">
+                <h3 className={`text-sm font-medium tracking-wide uppercase ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                  Precio Justo
+                </h3>
+                <p className="text-sm opacity-70 leading-relaxed">
+                  Ofrecemos la mejor relación calidad-precio del mercado, sin comprometer el rendimiento ni la durabilidad.
+                </p>
+              </div>
             </div>
           </div>
         </div>
 
         {/* CTA */}
-        <div className="bg-blue-50">
-          <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:py-16 lg:px-8 lg:flex lg:items-center lg:justify-between">
-            <h2 className="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
-              <span className="block">¿Listo para comenzar?</span>
-              <span className="block text-blue-600">Únete a nuestra comunidad de clientes satisfechos.</span>
-            </h2>
-            <div className="mt-8 flex lg:mt-0 lg:flex-shrink-0">
-              <div className="inline-flex rounded-md shadow">
-                <a
-                  href="#"
-                  className="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
-                >
-                  Contáctanos
-                </a>
-              </div>
-              <div className="ml-3 inline-flex rounded-md shadow">
-                <a
-                  href="#"
-                  className="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-blue-600 bg-white hover:bg-blue-50"
-                >
-                  Más información
-                </a>
-              </div>
-            </div>
+        <div className={`rounded-3xl p-16 text-center shadow-2xl relative overflow-hidden ${darkMode ? 'bg-[#1E1E1E]' : 'bg-[#37383F]'}`}>
+          <div className="absolute top-0 right-0 w-64 h-64 bg-[#3F96FC]/10 rounded-full blur-[100px] -mr-32 -mt-32"></div>
+          <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#FF854D]/5 rounded-full blur-[100px] -ml-32 -mb-32"></div>
+          
+          <h2 className="text-3xl font-light tracking-tighter text-white mb-6">
+            ¿Buscando la computadora perfecta?
+          </h2>
+          <p className="text-lg text-white/60 mb-10 max-w-xl mx-auto font-light leading-relaxed">
+            Nuestro equipo está listo para asesorarte y encontrar el equipo ideal para tus necesidades y presupuesto.
+          </p>
+          <div className="flex flex-col sm:flex-row justify-center gap-4 relative z-10">
+            <Link
+              to="/shop"
+              className="px-10 py-3 rounded-full bg-[#3F96FC] text-white text-xs tracking-[0.2em] font-medium hover:bg-[#2679e9] transition-all"
+            >
+              VER CATÁLOGO
+            </Link>
+            <Link
+              to="/contact"
+              className="px-10 py-3 rounded-full bg-white/5 text-white border border-white/10 text-xs tracking-[0.2em] font-medium hover:bg-white/10 transition-all"
+            >
+              CONTACTAR
+            </Link>
           </div>
         </div>
       </div>
@@ -238,4 +264,4 @@ const About = () => {
   );
 };
 
-export default About; 
+export default About;

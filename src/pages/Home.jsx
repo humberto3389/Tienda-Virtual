@@ -1,499 +1,487 @@
-import { useState, useEffect } from 'react';
-import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
+import { useState, useEffect, useRef } from 'react';
+import { ChevronLeftIcon, ChevronRightIcon, PlayIcon, ArrowRightIcon, ShoppingBagIcon, StarIcon, SparklesIcon, TruckIcon, ShieldCheckIcon } from '@heroicons/react/24/outline';
+import { StarIcon as StarIconSolid } from '@heroicons/react/24/solid';
 import { Link } from 'react-router-dom';
+import { formatPrice, discountedPrice } from '../utils/formatPrice';
 import DarkModeWrapper from '@/components/ui/DarkModeWrapper';
+import { opinionService } from '../services/opinionService';
+import { productService } from '../services/productService';
+import { supabase } from '../config/supabase';
+import LoadingSpinner from '../components/ui/LoadingSpinner';
+import { useTheme } from '../context/ThemeContext';
+
+const newsletterService = {
+  subscribe: async (email) => {
+    try {
+      if (!email || !email.includes('@') || !email.includes('.')) {
+        throw new Error('Por favor ingresa un correo electrónico válido');
+      }
+
+      const { data, error } = await supabase
+        .from('newsletter_subscribers')
+        .insert([{ email }])
+        .select();
+
+      if (error) {
+        if (error.code === '23505') {
+          return { success: false, message: '¡Ya estás suscrito a nuestro newsletter!' };
+        }
+        throw error;
+      }
+
+      return { success: true, message: '¡Gracias por suscribirte! Pronto recibirás nuestras novedades.' };
+    } catch (error) {
+      console.error('Error al suscribirse:', error);
+      return { success: false, message: error.message || 'Ocurrió un error al procesar tu suscripción' };
+    }
+  }
+};
+
+// Función para asignar gradientes a las categorías (ya no la usamos para mantener minimalismo "Carbon")
+
+const defaultCategoryImages = [
+  "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", // Laptops
+  "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", // Phones
+  "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", // Headphones
+  "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", // Tablets/Accessories
+  "https://images.unsplash.com/photo-1606220838315-056192d5e927?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", // Gaming
+  "https://images.unsplash.com/photo-1527443154391-42721869e5fe?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", // Smartwatches
+];
+
+const getCategoryImage = (category, index) => {
+  if (category.image_url) return category.image_url;
+
+  if (!category.name) return defaultCategoryImages[index % defaultCategoryImages.length];
+
+  const name = category.name.toLowerCase();
+  if (name.includes('laptop') || name.includes('mac') || name.includes('computadora')) return defaultCategoryImages[0];
+  if (name.includes('phone') || name.includes('celular') || name.includes('movil') || name.includes('iphone')) return defaultCategoryImages[1];
+  if (name.includes('audio') || name.includes('auricular') || name.includes('sound')) return defaultCategoryImages[2];
+  if (name.includes('tablet') || name.includes('ipad')) return defaultCategoryImages[3];
+  if (name.includes('gaming') || name.includes('consola') || name.includes('play')) return defaultCategoryImages[4];
+  if (name.includes('watch') || name.includes('reloj') || name.includes('wearable')) return defaultCategoryImages[5];
+
+  return defaultCategoryImages[index % defaultCategoryImages.length];
+};
+
+import { homeService } from '../services/homeService';
 
 const Home = () => {
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const [currentCategorySlide, setCurrentCategorySlide] = useState(0);
+  const [email, setEmail] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [subscriptionMessage, setSubscriptionMessage] = useState({ text: '', type: '' });
+  const [destacadas, setDestacadas] = useState([]);
+  const [loadingDestacadas, setLoadingDestacadas] = useState(true);
+  const [featuredProducts, setFeaturedProducts] = useState([]);
+  const [loadingFeaturedProducts, setLoadingFeaturedProducts] = useState(true);
+  const [realCategories, setRealCategories] = useState([]);
+  const [loadingCategories, setLoadingCategories] = useState(true);
+  const { theme } = useTheme();
 
-  const slides = [
-    {
-      title: "Tecnología de Vanguardia",
-      subtitle: "Descubre lo último en innovación tecnológica",
-      image: "https://images.unsplash.com/photo-1518770660439-4636190af475?ixlib=rb-4.0.3",
-      bgColor: "bg-gradient-to-r from-indigo-900 to-purple-800"
-    },
-    {
-      title: "Diseño Excepcional",
-      subtitle: "Productos diseñados para inspirar",
-      image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?ixlib=rb-4.0.3",
-      bgColor: "bg-gradient-to-r from-gray-900 to-blue-900"
-    },
-    {
-      title: "Rendimiento Superior",
-      subtitle: "Experimenta potencia sin límites",
-      image: "https://images.unsplash.com/photo-1587202372775-e229f172b9d3?ixlib=rb-4.0.3",
-      bgColor: "bg-gradient-to-r from-blue-900 to-indigo-800"
-    }
-  ];
+  const [heroData, setHeroData] = useState(null);
+  const [loadingHero, setLoadingHero] = useState(true);
 
-  const categories = [
-    {
-      name: "Laptops",
-      image: "https://images.unsplash.com/photo-1593642632823-8f785ba67e45?ixlib=rb-4.0.3"
-    },
-    {
-      name: "Workstations",
-      image: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?ixlib=rb-4.0.3"
-    },
-    {
-      name: "Componentes",
-      image: "https://images.unsplash.com/photo-1587202372775-e229f172b9d3?ixlib=rb-4.0.3"
-    },
-    {
-      name: "Accesorios",
-      image: "https://images.unsplash.com/photo-1546054454-aa26e2b734c7?ixlib=rb-4.0.3"
-    },
-    {
-      name: "Monitores",
-      image: "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?ixlib=rb-4.0.3"
-    },
-    {
-      name: "Periféricos",
-      image: "https://images.unsplash.com/photo-1587829741301-dc798b83add3?ixlib=rb-4.0.3"
-    },
-    {
-      name: "Almacenamiento",
-      image: "https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?ixlib=rb-4.0.3"
-    },
-    {
-      name: "Redes",
-      image: "https://images.unsplash.com/photo-1544197150-b99a580bb7a8?ixlib=rb-4.0.3"
-    }
-  ];
-
-  const nextSlide = () => {
-    setCurrentSlide((prev) => (prev === slides.length - 1 ? 0 : prev + 1));
-  };
-
-  const prevSlide = () => {
-    setCurrentSlide((prev) => (prev === 0 ? slides.length - 1 : prev - 1));
-  };
-
-  const nextCategorySlide = () => {
-    setCurrentCategorySlide((prev) => {
-      const maxSlides = Math.ceil(categories.length / 4) - 1;
-      return prev === maxSlides ? 0 : prev + 1;
-    });
-  };
-
-  const prevCategorySlide = () => {
-    setCurrentCategorySlide((prev) => {
-      const maxSlides = Math.ceil(categories.length / 4) - 1;
-      return prev === 0 ? maxSlides : prev - 1;
-    });
-  };
-
+  // Cargar datos del Hero
   useEffect(() => {
-    const interval = setInterval(() => {
-      nextSlide();
-    }, 5000);
-    return () => clearInterval(interval);
+    const fetchHero = async () => {
+      try {
+        const result = await homeService.getHeroData();
+        if (result.success) {
+          setHeroData(result.data);
+        }
+      } catch (error) {
+        console.error('Error loading hero data:', error);
+      } finally {
+        setLoadingHero(false);
+      }
+    };
+    fetchHero();
   }, []);
 
-  // Efecto para el carrusel automático de categorías
+  const handleNewsletterSubmit = async (e) => {
+    e.preventDefault();
+
+    setIsSubmitting(true);
+
+    const result = await newsletterService.subscribe(email);
+
+    setSubscriptionMessage({
+      text: result.message,
+      type: result.success ? 'success' : 'error'
+    });
+
+    setIsSubmitting(false);
+
+    setTimeout(() => {
+      setSubscriptionMessage({ text: '', type: '' });
+    }, 5000);
+
+    if (result.success) {
+      setEmail('');
+    }
+  };
+
   useEffect(() => {
-    if (categories.length <= 4) return;
-    
-    const interval = setInterval(() => {
-      nextCategorySlide();
-    }, 4000);
-    return () => clearInterval(interval);
-  }, [categories.length]);
+    const cargarDestacadas = async () => {
+      try {
+        const data = await opinionService.getOpinionesDestacadas();
+        setDestacadas(data);
+      } catch (error) {
+        console.error('Error cargando opiniones destacadas:', error);
+      } finally {
+        setLoadingDestacadas(false);
+      }
+    };
+    cargarDestacadas();
+  }, []);
+
+  // Cargar productos destacados
+  useEffect(() => {
+    const cargarProductosDestacados = async () => {
+      try {
+        setLoadingFeaturedProducts(true);
+        const result = await productService.getProducts({
+          page: 1,
+          limit: 8,
+          featured: true
+        });
+
+        if (result.success) {
+          const products = result.data;
+
+          // Cargar estadísticas de rating para cada producto
+          const productIds = products.map(p => p.id);
+          const ratingStatsResult = await productService.getMultipleProductsRatingStats(productIds);
+
+          if (ratingStatsResult.success) {
+            // Combinar productos con sus estadísticas de rating
+            const productsWithStats = products.map(product => ({
+              ...product,
+              rating: ratingStatsResult.data[product.id]?.averageRating || product.rating || 0,
+              reviews_count: ratingStatsResult.data[product.id]?.totalReviews || product.reviews_count || 0
+            }));
+
+            setFeaturedProducts(productsWithStats);
+          } else {
+            setFeaturedProducts(products);
+          }
+        } else {
+          console.error('Error cargando productos destacados:', result.error);
+        }
+      } catch (error) {
+        console.error('Error cargando productos destacados:', error);
+      } finally {
+        setLoadingFeaturedProducts(false);
+      }
+    };
+    cargarProductosDestacados();
+  }, []);
+
+  // Cargar categorías reales
+  useEffect(() => {
+    const cargarCategorias = async () => {
+      try {
+        setLoadingCategories(true);
+        const result = await productService.getCategories();
+
+        if (result.success) {
+          setRealCategories(result.data);
+        } else {
+          console.error('Error cargando categorías:', result.error);
+        }
+      } catch (error) {
+        console.error('Error cargando categorías:', error);
+      } finally {
+        setLoadingCategories(false);
+      }
+    };
+    cargarCategorias();
+  }, []);
 
   return (
-    <div className="min-h-screen">
-      {/* Hero Section */}
-      <section className="relative h-[600px] overflow-hidden bg-white dark:bg-gray-900">
-        <div className="relative h-screen max-h-[800px] overflow-hidden">
-          <div 
-            className="flex transition-transform duration-700 ease-in-out"
-            style={{ transform: `translateX(-${currentSlide * 100}%)` }}
-          >
-            {slides.map((slide, index) => (
-              <div 
-                key={index}
-                className={`w-full flex-shrink-0 h-screen max-h-[800px] relative ${slide.bgColor}`}
-              >
-                {/* Imagen de fondo que ocupa todo el espacio */}
-                <div className="absolute inset-0 w-full h-full">
-                  <img 
-                    src={slide.image} 
-                    alt={slide.title}
-                    className="w-full h-full object-cover object-center"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-transparent"></div>
-                </div>
-                
-                {/* Contenido superpuesto */}
-                <div className="container mx-auto px-6 flex flex-col md:flex-row items-center justify-between h-full relative z-10">
-                  <div className="md:w-1/2 lg:w-2/5 text-white space-y-6 px-4 md:px-0">
-                    <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
-                      {slide.title}
-                    </h1>
-                    <p className="text-xl md:text-2xl text-gray-200">
-                      {slide.subtitle}
-                    </p>
-                    <button className="px-8 py-3 bg-white text-gray-900 rounded-lg font-medium hover:bg-opacity-90 transition-all duration-300 transform hover:scale-105">
-                      Explorar Productos
-                    </button>
-                  </div>
-                  <div className="hidden md:block md:w-1/2 lg:w-3/5 h-full relative">
-                    {/* Espacio reservado para mantener el layout */}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Controles del carrusel */}
-          <button 
-            onClick={prevSlide}
-            className="absolute left-4 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-all"
-          >
-            <ChevronLeftIcon className="h-6 w-6" />
-          </button>
-          <button 
-            onClick={nextSlide}
-            className="absolute right-4 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-all"
-          >
-            <ChevronRightIcon className="h-6 w-6" />
-          </button>
-
-          {/* Indicadores */}
-          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex space-x-2">
-            {slides.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setCurrentSlide(index)}
-                className={`h-2 w-8 rounded-full transition-all ${currentSlide === index ? 'bg-white' : 'bg-white bg-opacity-50'}`}
+    <div className="min-h-screen bg-white dark:bg-[#18181b] selection:bg-[#3F96FC]/30">
+      {/* 1. MONUMENTAL HERO */}
+      <section className="relative h-screen min-h-[800px] flex items-center justify-center overflow-hidden">
+        {/* Abstract Background / Parallax Feel */}
+        <div className="absolute inset-0 z-0">
+          {!loadingHero && heroData && (
+            heroData.media_type === 'video' ? (
+              <video
+                src={heroData.media_url}
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="w-full h-full object-cover opacity-[0.85] dark:opacity-50 object-center transform scale-105"
               />
-            ))}
+            ) : (
+              <img
+                src={heroData.media_url || "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop"}
+                alt="Hero background"
+                className="w-full h-full object-cover opacity-[0.85] dark:opacity-50 object-center transform scale-105"
+              />
+            )
+          )}
+          {loadingHero && (
+            <div className="w-full h-full bg-stone-100 dark:bg-[#111] animate-pulse"></div>
+          )}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-white dark:to-[#0a0a0a]"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-white dark:to-[#18181b]"></div>
+        </div>
+
+        <div className="relative z-10 text-center px-4 max-w-5xl mx-auto mt-20">
+          <span className="inline-block py-2 px-5 border border-white/20 rounded-full text-white/90 text-[10px] tracking-[0.4em] font-medium mb-8 backdrop-blur-md bg-white/5 uppercase animate-fade-in-up">
+            {heroData?.badge || 'Nueva Era Tecnológica'}
+          </span>
+          <h1 className="text-6xl md:text-8xl lg:text-[10rem] font-light tracking-tighter leading-none mb-8 text-black dark:text-white">
+            <span className="block opacity-90 animate-fade-in-up" style={{animationDelay: '0.1s'}}>
+              {heroData?.title_primary || 'Piensa'}
+            </span>
+            <span className="block font-medium bg-gradient-to-r from-[#3F96FC] to-[#FF854D] bg-clip-text text-transparent animate-fade-in-up" style={{animationDelay: '0.2s'}}>
+              {heroData?.title_secondary || 'Diferente.'}
+            </span>
+          </h1>
+          <p className="text-xl md:text-2xl text-gray-500 dark:text-gray-400 font-light max-w-2xl mx-auto mb-14 tracking-wide leading-relaxed animate-fade-in-up" style={{animationDelay: '0.3s'}}>
+            {heroData?.subtitle || 'La innovación más avanzada en tus manos. Diseño sin concesiones, rendimiento absoluto.'}
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
+            <Link to={heroData?.button_primary_url || "/shop"} className="group relative px-12 py-5 bg-white text-black rounded-full overflow-hidden transition-all hover:scale-105 hover:shadow-2xl hover:shadow-white/20 animate-fade-in-up" style={{animationDelay: '0.4s'}}>
+              <span className="relative z-10 flex items-center text-[11px] tracking-[0.2em] font-medium">
+                {heroData?.button_primary_text || 'DESCUBRIR COLECCIÓN'} <ArrowRightIcon className="ml-3 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+              </span>
+            </Link>
+            {heroData?.button_secondary_text && (
+              <Link to={heroData?.button_secondary_url || "/servicios"} className="group relative px-12 py-5 border border-black/10 dark:border-white/10 text-black dark:text-white rounded-full overflow-hidden transition-all hover:scale-105 animate-fade-in-up" style={{animationDelay: '0.5s'}}>
+                <span className="relative z-10 flex items-center text-[11px] tracking-[0.2em] font-medium">
+                  {heroData.button_secondary_text}
+                </span>
+              </Link>
+            )}
           </div>
         </div>
       </section>
 
-      {/* Categories Section */}
-      <section className="py-16 bg-gray-50 dark:bg-gray-800">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-8 text-gray-900 dark:text-white">Categorías</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {categories.map((category, index) => (
-              <div
-                key={index}
-                className="rounded-lg overflow-hidden shadow-lg bg-white dark:bg-gray-700"
-              >
-                <div className="relative group overflow-hidden rounded-xl h-80">
-                  <img 
-                    src={category.image} 
-                    alt={category.name}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-70"></div>
-                  <div className="absolute bottom-0 left-0 p-6 w-full">
-                    <h3 className="text-xl font-bold text-white">{category.name}</h3>
-                    <button className="mt-2 text-sm text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      Ver productos →
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Featured Products Section */}
-      <section className="py-16 bg-white dark:bg-gray-900">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-8 text-gray-900 dark:text-white">Productos Destacados</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-            {[
-              {
-                name: "Laptop Pro X1",
-                price: 1299.99,
-                discount: 15,
-                rating: 4.8,
-                reviews: 124,
-                image: "https://images.unsplash.com/photo-1593642632823-8f785ba67e45?ixlib=rb-4.0.3",
-                isNew: true,
-                stock: 8
-              },
-              {
-                name: "Monitor Ultra HD",
-                price: 499.99,
-                discount: 0,
-                rating: 4.9,
-                reviews: 87,
-                image: "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?ixlib=rb-4.0.3",
-                isNew: false,
-                stock: 15
-              },
-              {
-                name: "Teclado Mecánico RGB",
-                price: 129.99,
-                discount: 20,
-                rating: 4.7,
-                reviews: 56,
-                image: "https://images.unsplash.com/photo-1587829741301-dc798b83add3?ixlib=rb-4.0.3",
-                isNew: false,
-                stock: 3
-              },
-              {
-                name: "SSD 1TB NVMe",
-                price: 199.99,
-                discount: 10,
-                rating: 4.9,
-                reviews: 42,
-                image: "https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?ixlib=rb-4.0.3",
-                isNew: true,
-                stock: 12
-              }
-            ].map((product, index) => (
-              <div
-                key={index}
-                className="rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 bg-white dark:bg-gray-700 border border-gray-100 dark:border-gray-600"
-              >
-                <div className="relative h-56 overflow-hidden group">
-                  <img 
-                    src={product.image} 
-                    alt={product.name}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                  
-                  {/* Badges */}
-                  <div className="absolute top-3 left-3 flex flex-col gap-2">
-                    {product.isNew && (
-                      <span className="bg-indigo-500 text-white text-xs px-2 py-1 rounded-full font-medium">
-                        Nuevo
-                      </span>
-                    )}
-                    {product.discount > 0 && (
-                      <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full font-medium">
-                        -{product.discount}%
-                      </span>
-                    )}
-                  </div>
-                  
-                  {/* Stock indicator */}
-                  {product.stock < 10 && product.stock > 0 && (
-                    <span className="absolute top-3 right-3 bg-amber-500 text-white text-xs px-2 py-1 rounded-full font-medium">
-                      ¡Últimas {product.stock} unidades!
-                    </span>
-                  )}
-                  {product.stock === 0 && (
-                    <span className="absolute top-3 right-3 bg-gray-500 text-white text-xs px-2 py-1 rounded-full font-medium">
-                      Agotado
-                    </span>
-                  )}
-                  
-                  {/* Quick action button */}
-                  <div className="absolute bottom-3 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <button className="bg-white text-gray-900 px-4 py-2 rounded-full text-sm font-medium shadow-lg hover:bg-gray-100 transition-colors">
-                      Ver detalles
-                    </button>
-                  </div>
-                </div>
-                
-                <div className="p-5">
-                  <div className="flex justify-between items-start mb-2">
-                    <h3 className="font-semibold text-lg text-gray-900 dark:text-white">{product.name}</h3>
-                  </div>
-                  
-                  <div className="flex items-center mb-3">
-                    <div className="flex text-yellow-400 mr-2">
-                      {[...Array(5)].map((_, i) => (
-                        <svg key={i} className={`w-4 h-4 ${i < Math.floor(product.rating) ? 'text-yellow-400' : 'text-gray-300'}`} fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                        </svg>
-                      ))}
-                    </div>
-                    <span className="text-sm text-gray-500">({product.reviews})</span>
-                  </div>
-                  
-                  <div className="flex justify-between items-center">
-                    <div>
-                      {product.discount > 0 ? (
-                        <div className="flex items-center">
-                          <span className="font-bold text-xl text-gray-900 dark:text-white">${(product.price * (1 - product.discount / 100)).toFixed(2)}</span>
-                          <span className="ml-2 text-sm text-gray-500 dark:text-gray-400 line-through">${product.price.toFixed(2)}</span>
-                        </div>
-                      ) : (
-                        <span className="font-bold text-xl text-gray-900 dark:text-white">${product.price.toFixed(2)}</span>
-                      )}
-                    </div>
-                    <button className="bg-indigo-600 hover:bg-indigo-700 text-white p-2 rounded-full transition-colors">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-          
-          <div className="text-center mt-12">
-            <button className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-lg font-medium transition-colors shadow-md hover:shadow-lg">
-              Ver todos los productos
-            </button>
-          </div>
-        </div>
-      </section>
-
-      {/* Newsletter */}
-      <section className="py-16 bg-gradient-to-br from-indigo-900 via-purple-800 to-indigo-900 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+      {/* 2. CATEGORY PILLS (Minimalist scroll) */}
+      <section className="py-8 bg-white dark:bg-[#18181b] border-b border-gray-100 dark:border-white/5 relative z-20">
         <div className="container mx-auto px-6">
-          <div className="max-w-4xl mx-auto bg-white/10 backdrop-blur-md rounded-2xl overflow-hidden shadow-2xl border border-white/20">
-            <div className="md:flex">
-              <div className="md:w-1/2 p-8 md:p-12">
-                <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Mantente Informado</h2>
-                <p className="text-indigo-100 text-lg mb-6">
-                  Suscríbete a nuestro boletín para recibir las últimas novedades, ofertas exclusivas y consejos tecnológicos.
-                </p>
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <input 
-                    type="email" 
-                    placeholder="Tu correo electrónico" 
-                    className="flex-grow px-5 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-indigo-200 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition-all"
-                  />
-                  <button className="bg-indigo-500 hover:bg-indigo-400 text-white px-6 py-3 rounded-lg font-medium transition-colors shadow-lg hover:shadow-indigo-500/30 transform hover:-translate-y-0.5">
-                    Suscribirse
-                  </button>
-                </div>
-                <p className="text-indigo-200 text-sm mt-4">
-                  Respetamos tu privacidad. Puedes darte de baja en cualquier momento.
-                </p>
-              </div>
-              <div className="md:w-1/2 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 p-8 md:p-12 flex items-center justify-center">
-                <div className="text-center">
-                  <div className="w-20 h-20 bg-indigo-500/30 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                    </svg>
-                  </div>
-                  <h3 className="text-xl font-semibold text-white mb-2">Beneficios exclusivos</h3>
-                  <ul className="text-indigo-100 space-y-2">
-                    <li className="flex items-center">
-                      <svg className="w-5 h-5 text-indigo-300 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                      </svg>
-                      Ofertas especiales
-                    </li>
-                    <li className="flex items-center">
-                      <svg className="w-5 h-5 text-indigo-300 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                      </svg>
-                      Lanzamientos anticipados
-                    </li>
-                    <li className="flex items-center">
-                      <svg className="w-5 h-5 text-indigo-300 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                      </svg>
-                      Consejos tecnológicos
-                    </li>
-                  </ul>
-                </div>
-              </div>
+          {loadingCategories ? (
+            <div className="flex justify-center"><LoadingSpinner size="sm" /></div>
+          ) : (
+            <div className="flex overflow-x-auto no-scrollbar gap-10 md:justify-center px-4 py-2">
+              <Link
+                to="/shop"
+                className="whitespace-nowrap text-xs font-medium tracking-[0.2em] uppercase text-black dark:text-white"
+              >
+                TODO
+              </Link>
+              {realCategories.map(cat => (
+                <Link
+                  key={cat.id}
+                  to={`/shop?category=${encodeURIComponent(cat.name)}`}
+                  className="whitespace-nowrap text-xs font-light tracking-[0.2em] uppercase text-gray-400 dark:text-gray-500 hover:text-black dark:hover:text-white transition-colors"
+                >
+                  {cat.name}
+                </Link>
+              ))}
             </div>
-          </div>
+          )}
         </div>
       </section>
 
-      {/* Testimonios */}
-      <section className="py-16 bg-gradient-to-b from-gray-50 to-white dark:from-gray-800 dark:to-gray-900">
-        <div className="container mx-auto px-6">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900 dark:text-white">Lo que dicen nuestros clientes</h2>
-            <p className="text-lg max-w-2xl mx-auto text-gray-600 dark:text-gray-300">
-              Experiencias reales de usuarios satisfechos
+      {/* 3. EDITORIAL PRODUCTS (Zig-Zag) */}
+      <section className="py-32 md:py-48 bg-white dark:bg-[#18181b]">
+        <div className="container mx-auto px-6 md:px-12 lg:px-24">
+          <div className="mb-32 md:mb-48 md:text-center">
+            <h2 className="text-5xl md:text-7xl font-light text-black dark:text-white tracking-tighter">
+              Lo Mejor <span className="font-semibold bg-gradient-to-r from-[#3F96FC] to-[#FF854D] bg-clip-text text-transparent">de la Tecnología.</span>
+            </h2>
+            <p className="mt-6 text-xl text-gray-500 font-light tracking-wide max-w-2xl md:mx-auto">
+              Cada pieza seleccionada representa el pináculo de la ingeniería moderna y el diseño estético.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              {
-                name: "Carlos Rodríguez",
-                role: "Diseñador Gráfico",
-                avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3",
-                rating: 5,
-                text: "La calidad de los productos es excepcional. El servicio al cliente fue rápido y eficiente. Definitivamente volveré a comprar aquí."
-              },
-              {
-                name: "Laura Martínez",
-                role: "Desarrolladora Web",
-                avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3",
-                rating: 5,
-                text: "Encontré exactamente lo que necesitaba para mi trabajo. La entrega fue rápida y el producto superó mis expectativas. ¡Altamente recomendado!"
-              },
-              {
-                name: "Miguel Sánchez",
-                role: "Estudiante de Ingeniería",
-                avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3",
-                rating: 4,
-                text: "Buena relación calidad-precio. Los productos son de alta calidad y el sitio web es fácil de usar. La única sugerencia sería mejorar los tiempos de envío."
-              }
-            ].map((testimonial, index) => (
-              <div
-                key={index}
-                className="rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 bg-white dark:bg-gray-700 border border-gray-100 dark:border-gray-600"
-              >
-                {/* Decorative element */}
-                <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 rounded-bl-full"></div>
-                
-                <div className="p-8 relative z-10">
-                  {/* Quote icon */}
-                  <div className="text-indigo-500/30 mb-4">
-                    <svg className="w-10 h-10" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
-                    </svg>
-                  </div>
-                  
-                  {/* Rating */}
-                  <div className="flex mb-4">
-                    {[...Array(5)].map((_, i) => (
-                      <svg key={i} className={`w-5 h-5 ${i < testimonial.rating ? 'text-yellow-400' : 'text-gray-300'}`} fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                    ))}
-                  </div>
-                  
-                  {/* Testimonial text */}
-                  <p className="text-gray-600 mb-6 italic">
-                    "{testimonial.text}"
-                  </p>
-                  
-                  {/* Author info */}
-                  <div className="flex items-center">
-                    <div className="h-12 w-12 rounded-full overflow-hidden mr-4 border-2 border-indigo-100">
-                      <img 
-                        src={testimonial.avatar} 
-                        alt={testimonial.name}
-                        className="w-full h-full object-cover"
+          {loadingFeaturedProducts ? (
+            <div className="flex justify-center py-24"><LoadingSpinner size="lg" color="gradient" /></div>
+          ) : (
+            <div className="space-y-40 md:space-y-64">
+              {featuredProducts.slice(0, 4).map((product, index) => (
+                <div key={product.id} className={`flex flex-col ${index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'} items-center gap-16 lg:gap-32`}>
+
+                  {/* Image Side */}
+                  <div className="w-full md:w-[55%]">
+                    <Link to={`/product/${product.id}`} className="block group relative w-full aspect-[4/5] md:aspect-square overflow-hidden rounded-[2.5rem] bg-[#F5F5F7] dark:bg-[#111]">
+                      {/* Fondo de reacción suave */}
+                      <div className="absolute inset-0 bg-gradient-to-br from-[#F5F5F7] to-[#EDEDEF] dark:from-[#111] dark:to-[#18181b] transition-all duration-[2s] ease-[cubic-bezier(0.25,1,0.5,1)] group-hover:scale-105"></div>
+
+                      <img
+                        src={product.image_url || 'https://images.unsplash.com/photo-1523206489230-c012c64b2b48?auto=format&fit=crop&w=1000&q=80'}
+                        alt={product.name}
+                        className="absolute inset-0 w-full h-full object-cover object-center scale-[1.02] group-hover:scale-[1.07] transition-transform duration-[2s] ease-[cubic-bezier(0.25,1,0.5,1)] mix-blend-multiply dark:mix-blend-normal"
                       />
+
+                      {/* Sombra viñeta para darle profundidad 'cinemática' */}
+                      <div className="absolute inset-0 shadow-[inset_0_0_120px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_0_120px_rgba(0,0,0,0.4)] pointer-events-none transition-opacity duration-1000 group-hover:opacity-100 opacity-60"></div>
+
+                      {/* Overlay sutil para oscurecer ligerísimamente en hover y mostrar contraste */}
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 dark:group-hover:bg-black/20 transition-colors duration-[2s] ease-[cubic-bezier(0.25,1,0.5,1)]"></div>
+
+                      {product.discount > 0 && (
+                        <span className="absolute top-10 left-10 px-6 py-3 bg-black/80 backdrop-blur-md text-white text-[11px] tracking-[0.2em] rounded-full drop-shadow-2xl">
+                          -{product.discount}%
+                        </span>
+                      )}
+                    </Link>
+                  </div>
+
+                  {/* Text Side */}
+                  <div className="w-full md:w-[45%] flex flex-col justify-center">
+                    <span className="text-[10px] tracking-[0.4em] font-medium text-gray-400 mb-6 uppercase block">
+                      Edición Limitada {String(index + 1).padStart(2, '0')}
+                    </span>
+                    <h3 className="text-4xl lg:text-5xl font-light text-black dark:text-white tracking-tight leading-tight mb-8">
+                      {product.name}
+                    </h3>
+                    <p className="text-lg text-gray-500 font-light leading-relaxed mb-10">
+                      {product.description?.substring(0, 150) || 'Descubre el diseño sofisticado y las capacidades avanzadas de este dispositivo excepcional, creado minuciosamente para inspirar.'}...
+                    </p>
+
+                    <div className="flex items-end gap-4 mb-12">
+                      <div className="text-3xl font-light tracking-tight text-black dark:text-white">
+                        {formatPrice(discountedPrice(product.price, product.discount))}
+                      </div>
+                      {product.discount > 0 && (
+                        <div className="text-sm font-light text-gray-400 line-through mb-1">
+                          {formatPrice(product.price)}
+                        </div>
+                      )}
                     </div>
+
                     <div>
-                      <h4 className="font-semibold text-gray-900">{testimonial.name}</h4>
-                      <p className="text-sm text-indigo-600">{testimonial.role}</p>
+                      <Link
+                        to={`/product/${product.id}`}
+                        className="inline-flex items-center pb-3 border-b border-black/20 dark:border-white/20 text-[11px] tracking-[0.2em] font-medium text-black dark:text-white hover:border-black dark:hover:border-white transition-colors group"
+                      >
+                        VER DETALLES <ArrowRightIcon className="ml-3 h-4 w-4 group-hover:translate-x-2 transition-transform" />
+                      </Link>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-          
-          {/* Call to action */}
-          <div className="text-center mt-12">
-            <Link 
-              to="/opiniones"
-              className="inline-block bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-lg font-medium transition-colors shadow-md hover:shadow-lg"
-            >
-              Ver más testimonios
+              ))}
+            </div>
+          )}
+
+          <div className="mt-48 text-center">
+            <Link to="/shop" className="inline-block px-14 py-6 border border-black/10 dark:border-white/10 rounded-full text-[11px] tracking-[0.2em] uppercase font-medium text-black dark:text-white hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all duration-500">
+              Explorar Todo El Catálogo
             </Link>
           </div>
+        </div>
+      </section>
+
+      {/* 4. PREMIUM TESTIMONIALS (Social Proof) */}
+      {!loadingDestacadas && destacadas.length > 0 && (
+        <section className="py-32 bg-[#F5F5F7] dark:bg-[#0a0a0a] border-y border-gray-200/50 dark:border-white/5 transition-colors duration-500">
+          <div className="container mx-auto px-6 max-w-7xl">
+            <div className="text-center mb-20">
+              <span className="text-[10px] tracking-[0.4em] font-medium text-[#3F96FC] uppercase block mb-4">
+                Testimonios Reales
+              </span>
+              <h2 className="text-4xl md:text-5xl font-light text-black dark:text-white tracking-tighter">
+                Lo que dicen <span className="font-semibold italic">nuestros clientes.</span>
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {destacadas.slice(0, 3).map((opinion) => (
+                <div 
+                  key={opinion.id} 
+                  className="group relative bg-white dark:bg-[#111] p-10 rounded-[2.5rem] border border-gray-100 dark:border-white/5 shadow-sm hover:shadow-2xl hover:shadow-black/5 dark:hover:shadow-white/5 transition-all duration-500 flex flex-col h-full"
+                >
+                  <div className="flex items-center gap-1 mb-6">
+                    {[...Array(5)].map((_, i) => (
+                      <StarIconSolid 
+                        key={i} 
+                        className={`h-4 w-4 ${i < opinion.rating ? 'text-yellow-400' : 'text-gray-200 dark:text-gray-800'}`} 
+                      />
+                    ))}
+                  </div>
+
+                  <blockquote className="flex-grow">
+                    <p className="text-lg font-light leading-relaxed text-gray-600 dark:text-gray-300 italic mb-8">
+                      "{opinion.mensaje}"
+                    </p>
+                  </blockquote>
+
+                  <div className="flex items-center gap-4 pt-8 border-t border-gray-50 dark:border-white/5">
+                    <div className="relative">
+                      <img 
+                        src={opinion.avatar} 
+                        alt={opinion.nombre} 
+                        className="w-12 h-12 rounded-full object-cover border border-black/5 dark:border-white/10" 
+                      />
+                      <div className="absolute -bottom-1 -right-1 bg-green-500 w-3 h-3 rounded-full border-2 border-white dark:border-[#111]"></div>
+                    </div>
+                    <div>
+                      <div className="text-sm font-bold text-black dark:text-white tracking-tight">
+                        {opinion.nombre}
+                      </div>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span className="text-[9px] text-gray-400 tracking-[0.1em] uppercase">
+                          {opinion.producto}
+                        </span>
+                        <span className="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700"></span>
+                        <span className="text-[9px] text-gray-400 tracking-[0.1em]">
+                          {new Date(opinion.fecha).toLocaleDateString('es-ES', { month: 'short', year: 'numeric' })}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="absolute top-10 right-10 opacity-[0.03] dark:opacity-[0.07] group-hover:opacity-[0.05] dark:group-hover:opacity-[0.1] transition-opacity duration-500">
+                    <svg className="h-16 w-16" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
+                    </svg>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* 5. NEWSLETTER (Ultra minimal) */}
+      <section className="py-40 bg-white dark:bg-[#18181b]">
+        <div className="container mx-auto px-6 max-w-2xl text-center">
+          <h2 className="text-4xl md:text-5xl font-light text-black dark:text-white tracking-tighter mb-6">
+            <span className="font-semibold bg-gradient-to-r from-[#3F96FC] to-[#FF854D] bg-clip-text text-transparent">Únete a la Vanguardia.</span>
+          </h2>
+          <p className="text-gray-500 font-light mb-16 tracking-wide text-lg">
+            Ingresa tu correo para recibir acceso anticipado a colaboraciones exclusivas y nuevos lanzamientos de diseño.
+          </p>
+
+          <form onSubmit={handleNewsletterSubmit} className="relative group">
+            <input
+              type="email"
+              placeholder="Tu dirección de correo"
+              className="w-full bg-transparent border-b border-gray-200 dark:border-gray-800 py-4 px-2 text-center text-xl font-light text-black dark:text-white placeholder-gray-400 focus:outline-none focus:border-black dark:focus:border-white transition-colors"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              disabled={isSubmitting}
+            />
+            <button
+              type="submit"
+              className="mt-12 px-12 py-5 uppercase tracking-[0.2em] text-[10px] font-medium bg-black text-white dark:bg-white dark:text-black rounded-full hover:scale-105 transition-transform disabled:opacity-50"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? 'PROCESANDO...' : 'SUSCRÍBIRME'}
+            </button>
+          </form>
+          {subscriptionMessage.text && (
+            <p className={`mt-8 text-xs font-medium tracking-[0.1em] uppercase ${subscriptionMessage.type === 'error' ? 'text-[#FF854D]' : 'text-[#3F96FC]'}`}>
+              {subscriptionMessage.text}
+            </p>
+          )}
         </div>
       </section>
     </div>

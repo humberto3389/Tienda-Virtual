@@ -1,22 +1,23 @@
 import { createClient } from '@supabase/supabase-js'
 
-// Validar variables de entorno antes de crear el cliente
 const validateEnv = () => {
   const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
   const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
-  if (!supabaseUrl || !supabaseAnonKey) {
-    throw new Error(
-      'Las variables de entorno VITE_SUPABASE_URL y VITE_SUPABASE_ANON_KEY son requeridas'
-    )
+  // Mejorar mensajes de error
+  if (!supabaseUrl) throw new Error('VITE_SUPABASE_URL no está definida en .env')
+  if (!supabaseAnonKey) throw new Error('VITE_SUPABASE_ANON_KEY no está definida en .env')
+  
+  // Validación más estricta de URL
+  try {
+    new URL(supabaseUrl)
+  } catch {
+    throw new Error('VITE_SUPABASE_URL no es una URL válida')
   }
 
-  if (!supabaseUrl.startsWith('https://')) {
-    throw new Error('VITE_SUPABASE_URL debe comenzar con https://')
-  }
-
-  if (supabaseAnonKey.length < 20) {
-    throw new Error('VITE_SUPABASE_ANON_KEY parece no ser válida')
+  // Validación de estructura de la clave
+  if (!/^eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\.eyJ/.test(supabaseAnonKey)) {
+    throw new Error('La clave anónima no parece ser un JWT válido')
   }
 
   return { supabaseUrl, supabaseAnonKey }
@@ -26,57 +27,54 @@ const createSupabaseClient = () => {
   try {
     const { supabaseUrl, supabaseAnonKey } = validateEnv()
 
-    // Configuración extendida del cliente Supabase
     const client = createClient(supabaseUrl, supabaseAnonKey, {
       auth: {
         autoRefreshToken: true,
         persistSession: true,
         detectSessionInUrl: true,
         flowType: 'pkce',
-        debug: import.meta.env.DEV
+        debug: false,
+        storage: {
+          getItem: (key) => localStorage.getItem(key),
+          setItem: (key, value) => localStorage.setItem(key, value),
+          removeItem: (key) => localStorage.removeItem(key)
+        }
       },
       db: {
         schema: 'public'
       },
       global: {
         headers: {
-          'X-Client-Info': 'my-app/v1.0'
+          'X-Client-Info': 'yerzystore/v1.0',
+          'Cache-Control': 'no-cache, no-store, must-revalidate'
         }
       }
     })
 
-    // Verificación de conexión (opcional, solo en desarrollo)
-    if (import.meta.env.DEV) {
-      client
-        .from('users')
-        .select('*', { count: 'exact', head: true })
-        .then(({ error }) => {
-          if (error) {
-            console.error('Error conectando con Supabase:', error.message)
-          } else {
-            console.log('Conexión con Supabase establecida correctamente')
-          }
-        })
+    // Healthcheck silencioso (solo errores críticos)
+    const healthCheck = async () => {
+      try {
+        const { error } = await client
+          .from('profiles')
+          .select('*', { count: 'exact', head: true })
+          .limit(1)
+        if (error) console.error('[Supabase] Error de conexión:', error.message)
+      } catch (error) {
+        console.error('[Supabase] Error de conexión:', error.message)
+      }
     }
+    setTimeout(healthCheck, 1000)
 
     return client
   } catch (error) {
-    console.error('Error al configurar Supabase:', error.message)
-    // Cliente mock para manejo de errores
-    return {
-      auth: {
-        signInWithPassword: () => Promise.reject(error),
-        signUp: () => Promise.reject(error),
-        signInWithOAuth: () => Promise.reject(error),
-        signOut: () => Promise.reject(error)
-      },
-      from: () => ({
-        select: () => Promise.reject(error),
-        insert: () => Promise.reject(error),
-        update: () => Promise.reject(error),
-        delete: () => Promise.reject(error)
-      })
-    }
+    console.error('[Supabase] Error crítico:', error.message)
+    
+    // Mock client mejorado para producción
+    return import.meta.env.PROD ? {
+      auth: { 
+        getSession: () => Promise.resolve({ data: { session: null }, error: error }) 
+      }
+    } : Promise.reject(error)
   }
 }
 

@@ -1,53 +1,54 @@
 import { useState, useEffect } from 'react';
 import { StarIcon } from '@heroicons/react/24/solid';
+import { useTheme } from '../context/ThemeContext';
+import LoadingSpinner from '../components/ui/LoadingSpinner';
 import OpinionForm from '../components/OpinionForm';
-import OpinionList from '../components/OpinionList';
-
+import {opinionService} from '../services/opinionService';
 const Opiniones = () => {
   const [opinions, setOpinions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState({
+    promedio: 0,
+    total: 0,
+    satisfechos: 0,
+    tiempoRespuesta: 0
+  });
+
+  const fetchOpinions = async () => {
+    setLoading(true);
+    try {
+      const data = await opinionService.getTodasLasOpiniones();
+      setOpinions(data);
+      
+      // Calcular estadísticas dinámicamente
+      if (data.length > 0) {
+        // Calcular promedio de calificaciones
+        const sumaRatings = data.reduce((sum, opinion) => sum + opinion.rating, 0);
+        const promedio = (sumaRatings / data.length).toFixed(1);
+        
+        // Calcular porcentaje de clientes satisfechos (rating >= 4)
+        const clientesSatisfechos = data.filter(opinion => opinion.rating >= 4).length;
+        const porcentajeSatisfechos = Math.round((clientesSatisfechos / data.length) * 100);
+        
+        // Tiempo de respuesta promedio (simulado - podría ser un dato real de la base de datos)
+        // En este caso usamos un valor fijo, pero podría calcularse si tuviéramos datos de tiempo de respuesta
+        const tiempoRespuesta = 4.5;
+        
+        setStats({
+          promedio,
+          total: data.length,
+          satisfechos: porcentajeSatisfechos,
+          tiempoRespuesta
+        });
+      }
+    } catch (error) {
+      console.error('Error cargando opiniones:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    // Aquí iría la llamada a la API para obtener las opiniones
-    // Por ahora usamos datos de ejemplo
-    const fetchOpinions = async () => {
-      try {
-        // Simulación de carga de datos
-        const sampleOpinions = [
-          {
-            nombre: "Carlos Rodríguez",
-            producto: "Laptop HP Pavilion",
-            mensaje: "Excelente producto, muy buena relación calidad-precio. La entrega fue rápida y el servicio al cliente muy atento.",
-            rating: 5,
-            fecha: "2024-03-15",
-            avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3"
-          },
-          {
-            nombre: "Laura Martínez",
-            producto: "Monitor Dell 27\"",
-            mensaje: "El monitor es perfecto para mi trabajo. Los colores son muy precisos y la resolución es excelente.",
-            rating: 4,
-            fecha: "2024-03-10",
-            avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3"
-          },
-          {
-            nombre: "Miguel Sánchez",
-            producto: "Teclado Mecánico RGB",
-            mensaje: "La calidad del teclado es impresionante. Los switches son suaves y la iluminación RGB es espectacular.",
-            rating: 5,
-            fecha: "2024-03-05",
-            avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3"
-          }
-        ];
-        
-        setOpinions(sampleOpinions);
-        setLoading(false);
-      } catch (error) {
-        console.error('Error al cargar las opiniones:', error);
-        setLoading(false);
-      }
-    };
-
     fetchOpinions();
   }, []);
 
@@ -72,19 +73,19 @@ const Opiniones = () => {
             {/* Estadísticas */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
               <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
-                <div className="text-3xl font-bold text-indigo-600 dark:text-indigo-400 mb-2">4.8</div>
+                <div className="text-3xl font-bold text-indigo-600 dark:text-indigo-400 mb-2">{stats.promedio}</div>
                 <div className="text-sm text-gray-600 dark:text-gray-300">Calificación promedio</div>
               </div>
               <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
-                <div className="text-3xl font-bold text-indigo-600 dark:text-indigo-400 mb-2">500+</div>
+                <div className="text-3xl font-bold text-indigo-600 dark:text-indigo-400 mb-2">{stats.total}</div>
                 <div className="text-sm text-gray-600 dark:text-gray-300">Opiniones</div>
               </div>
               <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
-                <div className="text-3xl font-bold text-indigo-600 dark:text-indigo-400 mb-2">98%</div>
+                <div className="text-3xl font-bold text-indigo-600 dark:text-indigo-400 mb-2">{stats.satisfechos}%</div>
                 <div className="text-sm text-gray-600 dark:text-gray-300">Clientes satisfechos</div>
               </div>
               <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
-                <div className="text-3xl font-bold text-indigo-600 dark:text-indigo-400 mb-2">4.5</div>
+                <div className="text-3xl font-bold text-indigo-600 dark:text-indigo-400 mb-2">{stats.tiempoRespuesta}</div>
                 <div className="text-sm text-gray-600 dark:text-gray-300">Tiempo de respuesta</div>
               </div>
             </div>
@@ -98,9 +99,8 @@ const Opiniones = () => {
           {/* Lista de opiniones */}
           <div className="lg:col-span-2">
             {loading ? (
-              <div className="text-center py-12">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
-                <p className="mt-4 text-gray-600 dark:text-gray-400">Cargando opiniones...</p>
+              <div className="flex items-center justify-center min-h-[60vh]">
+                <LoadingSpinner size="lg" color="gradient" />
               </div>
             ) : (
               <div className="space-y-6">
@@ -144,12 +144,19 @@ const Opiniones = () => {
                           "{opinion.mensaje}"
                         </p>
                         <div className="mt-4 text-sm text-gray-500 dark:text-gray-400">
-                          {new Date(opinion.fecha).toLocaleDateString('es-ES', {
+                          {opinion.fecha ? new Date(opinion.fecha).toLocaleDateString('es-ES', {
                             year: 'numeric',
                             month: 'long',
                             day: 'numeric'
-                          })}
+                          }) : 'Fecha no disponible'}
                         </div>
+                        
+                        {/* Mensaje de estado si la opinión está pendiente */}
+                        {opinion.status === 'pending' && (
+                          <div className="mt-2 text-sm text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 rounded-md px-3 py-1 inline-block">
+                            <span className="font-medium">En revisión:</span> Esta opinión está pendiente de aprobación
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -161,7 +168,7 @@ const Opiniones = () => {
           {/* Formulario de opiniones */}
           <div className="lg:col-span-1">
             <div className="sticky top-6">
-              <OpinionForm />
+              <OpinionForm fetchOpinions={fetchOpinions} />
             </div>
           </div>
         </div>
@@ -170,4 +177,4 @@ const Opiniones = () => {
   );
 };
 
-export default Opiniones; 
+export default Opiniones;

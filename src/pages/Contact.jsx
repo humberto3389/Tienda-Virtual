@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { contactService } from '../services/contactService';
+import { useAuth } from '../context/auth/AuthContext';
 import { 
   EnvelopeIcon, 
   PhoneIcon, 
@@ -6,10 +8,13 @@ import {
   ClockIcon,
   ChatBubbleLeftRightIcon,
   PaperAirplaneIcon,
-  CheckCircleIcon
+  CheckCircleIcon,
+  ChevronDownIcon,
+  ShieldCheckIcon
 } from '@heroicons/react/24/outline';
 
 const Contact = () => {
+  const { user, profile } = useAuth();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -19,6 +24,59 @@ const Contact = () => {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [contactData, setContactData] = useState({});
+  const [faqs, setFaqs] = useState([]);
+  const [mapUrl, setMapUrl] = useState('');
+
+  useEffect(() => {
+    const loadUserData = async () => {
+      if (user && profile) {
+        setFormData(prev => ({
+          ...prev,
+          name: profile.nombre && profile.apellido ? `${profile.nombre} ${profile.apellido}` : profile.nombre || '',
+          email: user.email || ''
+        }));
+        
+        try {
+          const lastMessage = await contactService.getUserLastMessage(user.email);
+          if (lastMessage) {
+            setFormData(prev => ({
+              ...prev,
+              subject: lastMessage.subject || prev.subject,
+              message: ''
+            }));
+          }
+        } catch (error) {
+          console.error('Error al cargar el último mensaje:', error);
+        }
+      }
+    };
+    loadUserData();
+  }, [user, profile]);
+
+  useEffect(() => {
+    const loadData = async () => {
+      const { data: contactInfo } = await contactService.getContactInfo();
+      const { data: faqsData } = await contactService.getFAQs();
+      
+      const contactMap = contactInfo.reduce((acc, item) => {
+        acc[item.type] = item.value;
+        return acc;
+      }, {});
+      
+      setContactData(contactMap);
+      setFaqs(faqsData);
+    };
+    loadData();
+  }, []);
+
+  useEffect(() => {
+    const loadMapUrl = async () => {
+      const url = await contactService.getContactMap();
+      setMapUrl(url);
+    };
+    loadMapUrl();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -28,13 +86,14 @@ const Contact = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Simulación de envío de formulario
-    setTimeout(() => {
-      setIsSubmitting(false);
+    try {
+      const { data, error } = await contactService.submitContactMessage(formData);
+      if (error) throw error;
+      
       setSubmitSuccess(true);
       setFormData({
         name: '',
@@ -43,23 +102,24 @@ const Contact = () => {
         message: ''
       });
       
-      // Resetear el mensaje de éxito después de 3 segundos
-      setTimeout(() => {
-        setSubmitSuccess(false);
-      }, 3000);
-    }, 1500);
+      setTimeout(() => setSubmitSuccess(false), 3000);
+    } catch (error) {
+      console.error('Error submitting message:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-white dark:bg-[#0a0a0a] transition-colors duration-500">
       {/* Hero Section */}
-      <div className="bg-white dark:bg-gray-800 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div className="border-b border-gray-100 dark:border-white/5">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32">
           <div className="text-center">
-            <h1 className="text-4xl font-bold text-gray-900 dark:text-white sm:text-5xl">
-              Contacta con Nosotros
+            <h1 className="text-5xl md:text-7xl font-light tracking-tighter mb-6 text-black dark:text-white">
+              Contacto <span className="font-semibold">Directo.</span>
             </h1>
-            <p className="mt-4 text-lg text-gray-600 dark:text-gray-300">
+            <p className="max-w-xl mx-auto text-lg text-gray-500 font-light tracking-wide leading-relaxed">
               Estamos aquí para ayudarte. Envíanos un mensaje y te responderemos lo antes posible.
             </p>
           </div>
@@ -67,56 +127,64 @@ const Contact = () => {
       </div>
 
       {/* Contact Information Grid */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="max-w-9xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Email */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow duration-300">
+          <div className="bg-[#F5F5F7] dark:bg-[#111] rounded-[2rem] p-8 hover:scale-[1.02] transition-transform duration-500">
             <div className="flex items-center space-x-4">
-              <div className="bg-indigo-100 dark:bg-indigo-900 p-3 rounded-full">
-                <EnvelopeIcon className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
+              <div className="p-3 rounded-full bg-white dark:bg-black text-[#3F96FC]">
+                <EnvelopeIcon className="h-5 w-5" />
               </div>
               <div>
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white">Email</h3>
-                <p className="mt-1 text-gray-600 dark:text-gray-300">info@yersiman.com</p>
+                <h3 className="text-[10px] font-medium tracking-[0.2em] uppercase text-gray-400 mb-1">Email</h3>
+                <p className="text-sm font-light text-black dark:text-white">
+                  {contactData.email || 'info@yersiman.com'}
+                </p>
               </div>
             </div>
           </div>
 
           {/* Phone */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow duration-300">
+          <div className="bg-[#F5F5F7] dark:bg-[#111] rounded-[2rem] p-8 hover:scale-[1.02] transition-transform duration-500">
             <div className="flex items-center space-x-4">
-              <div className="bg-green-100 dark:bg-green-900 p-3 rounded-full">
-                <PhoneIcon className="h-6 w-6 text-green-600 dark:text-green-400" />
+              <div className="p-3 rounded-full bg-white dark:bg-black text-[#3F96FC]">
+                <PhoneIcon className="h-5 w-5" />
               </div>
               <div>
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white">Teléfono</h3>
-                <p className="mt-1 text-gray-600 dark:text-gray-300">+34 123 456 789</p>
+                <h3 className="text-[10px] font-medium tracking-[0.2em] uppercase text-gray-400 mb-1">Teléfono</h3>
+                <p className="text-sm font-light text-black dark:text-white">
+                  {contactData.phone || '+34 123 456 789'}
+                </p>
               </div>
             </div>
           </div>
 
           {/* Location */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow duration-300">
+          <div className="bg-[#F5F5F7] dark:bg-[#111] rounded-[2rem] p-8 hover:scale-[1.02] transition-transform duration-500">
             <div className="flex items-center space-x-4">
-              <div className="bg-blue-100 dark:bg-blue-900 p-3 rounded-full">
-                <MapPinIcon className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+              <div className="p-3 rounded-full bg-white dark:bg-black text-[#3F96FC]">
+                <MapPinIcon className="h-5 w-5" />
               </div>
               <div>
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white">Ubicación</h3>
-                <p className="mt-1 text-gray-600 dark:text-gray-300">Madrid, España</p>
+                <h3 className="text-[10px] font-medium tracking-[0.2em] uppercase text-gray-400 mb-1">Ubicación</h3>
+                <p className="text-sm font-light text-black dark:text-white">
+                  {contactData.location || 'Madrid, España'}
+                </p>
               </div>
             </div>
           </div>
 
           {/* Hours */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow duration-300">
+          <div className="bg-[#F5F5F7] dark:bg-[#111] rounded-[2rem] p-8 hover:scale-[1.02] transition-transform duration-500">
             <div className="flex items-center space-x-4">
-              <div className="bg-purple-100 dark:bg-purple-900 p-3 rounded-full">
-                <ClockIcon className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+              <div className="p-3 rounded-full bg-white dark:bg-black text-[#3F96FC]">
+                <ClockIcon className="h-5 w-5" />
               </div>
               <div>
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white">Horario</h3>
-                <p className="mt-1 text-gray-600 dark:text-gray-300">Lun-Vie: 9:00-18:00</p>
+                <h3 className="text-[10px] font-medium tracking-[0.2em] uppercase text-gray-400 mb-1">Horario</h3>
+                <p className="text-sm font-light text-black dark:text-white">
+                  {contactData.hours || 'Lun-Vie: 9:00-18:00'}
+                </p>
               </div>
             </div>
           </div>
@@ -127,141 +195,174 @@ const Contact = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Form */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-8">
-            <div className="flex items-center space-x-4 mb-8">
-              <div className="bg-indigo-100 dark:bg-indigo-900 p-3 rounded-full">
-                <ChatBubbleLeftRightIcon className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
+          <div className="p-10 lg:p-14 rounded-[2.5rem] bg-[#F5F5F7] dark:bg-[#111]">
+            <div className="flex items-center space-x-4 mb-10">
+              <div className="p-3 rounded-full bg-white dark:bg-black text-[#3F96FC]">
+                <ChatBubbleLeftRightIcon className="h-6 w-6" />
               </div>
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Envíanos un Mensaje</h2>
+              <h2 className="text-2xl font-light tracking-tighter text-black dark:text-white">Envíanos un mensaje</h2>
             </div>
 
-            {submitSuccess && (
-              <div className="mb-6 p-4 bg-green-50 dark:bg-green-900 rounded-lg">
-                <div className="flex items-center space-x-2 text-green-600 dark:text-green-400">
-                  <CheckCircleIcon className="h-5 w-5" />
-                  <p>¡Mensaje enviado con éxito! Nos pondremos en contacto contigo pronto.</p>
+            {!user ? (
+              <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-xl p-8 text-center border border-indigo-100 dark:border-indigo-900/30">
+                <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-indigo-100 dark:bg-indigo-900/30 mb-4">
+                  <ShieldCheckIcon className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
+                </div>
+                <h3 className="text-lg font-medium text-indigo-900 dark:text-indigo-200 mb-2">
+                  Acceso Requerido
+                </h3>
+                <p className="text-indigo-700 dark:text-indigo-300 mb-4">
+                  Para enviar mensajes necesitas tener una cuenta registrada
+                </p>
+                <div className="mt-6">
+                  <a
+                    href="/login"
+                    className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800"
+                  >
+                    Iniciar Sesión
+                  </a>
+                  <p className="mt-4 text-sm text-indigo-700 dark:text-indigo-300">
+                    ¿No tienes cuenta?{' '}
+                    <a href="/register" className="text-indigo-600 dark:text-indigo-400 hover:underline">
+                      Regístrate aquí
+                    </a>
+                  </p>
                 </div>
               </div>
+            ) : (
+              <>
+                {submitSuccess && (
+                  <div className="mb-6 p-4 bg-green-50 dark:bg-green-900 rounded-lg">
+                    <div className="flex items-center space-x-2 text-green-600 dark:text-green-400">
+                      <CheckCircleIcon className="h-5 w-5" />
+                      <p>¡Mensaje enviado con éxito! Nos pondremos en contacto contigo pronto.</p>
+                    </div>
+                  </div>
+                )}
+
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-[10px] font-medium tracking-widest uppercase opacity-50 mb-2">Nombre</label>
+                      <input
+                        type="text"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleChange}
+                        required
+                        className="w-full px-5 py-3 rounded-full bg-gray-50 dark:bg-gray-800/50 border-gray-100 dark:border-gray-700 text-sm font-light text-gray-900 dark:text-white focus:border-[#3F96FC] outline-none transition-colors"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-medium tracking-widest uppercase opacity-50 mb-2">Email</label>
+                      <input
+                        type="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        required
+                        className="w-full px-5 py-3 rounded-full bg-gray-50 dark:bg-gray-800/50 border-gray-100 dark:border-gray-700 text-sm font-light text-gray-900 dark:text-white focus:border-[#3F96FC] outline-none transition-colors"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-medium tracking-widest uppercase opacity-50 mb-2">Asunto</label>
+                    <input
+                      type="text"
+                      name="subject"
+                      value={formData.subject}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-5 py-3 rounded-full bg-gray-50 dark:bg-gray-800/50 border-gray-100 dark:border-gray-700 text-sm font-light text-gray-900 dark:text-white focus:border-[#3F96FC] outline-none transition-colors"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-medium tracking-widest uppercase opacity-50 mb-2">Mensaje</label>
+                    <textarea
+                      name="message"
+                      rows={4}
+                      value={formData.message}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-5 py-4 rounded-3xl bg-gray-50 dark:bg-gray-800/50 border-gray-100 dark:border-gray-700 text-sm font-light text-gray-900 dark:text-white focus:border-[#3F96FC] outline-none transition-colors resize-none"
+                    />
+                  </div>
+
+                  <div className="mt-8">
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="w-full flex items-center justify-center px-10 py-4 rounded-full bg-[#37383F] text-white text-xs tracking-[0.2em] font-medium hover:bg-[#2a2b30] transition-all disabled:opacity-50"
+                    >
+                      {isSubmitting ? 'ENVIANDO...' : 'ENVIAR MENSAJE'}
+                    </button>
+                  </div>
+                </form>
+              </>
             )}
-
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Nombre
-                  </label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    required
-                    className="mt-1 block w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    required
-                    className="mt-1 block w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label htmlFor="subject" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Asunto
-                </label>
-                <input
-                  type="text"
-                  id="subject"
-                  name="subject"
-                  value={formData.subject}
-                  onChange={handleChange}
-                  required
-                  className="mt-1 block w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="message" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Mensaje
-                </label>
-                <textarea
-                  id="message"
-                  name="message"
-                  rows={4}
-                  value={formData.message}
-                  onChange={handleChange}
-                  required
-                  className="mt-1 block w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white"
-                />
-              </div>
-
-              <div>
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full flex items-center justify-center px-6 py-3 border border-transparent rounded-lg shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      Enviando...
-                    </>
-                  ) : (
-                    <>
-                      <PaperAirplaneIcon className="h-5 w-5 mr-2" />
-                      Enviar Mensaje
-                    </>
-                  )}
-                </button>
-              </div>
-            </form>
           </div>
 
-          {/* Map and Additional Info */}
+          {/* Map and FAQ Section */}
           <div className="space-y-8">
             {/* Map */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
-              <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3037.496060387987!2d-3.703790384603966!3d40.41677547936467!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd42287e9d1db54d%3A0xd2f8f8f8f8f8f8f8!2sMadrid%2C%20Spain!5e0!3m2!1sen!2sus!4v1633024000000!5m2!1sen!2sus"
-                width="100%"
-                height="300"
-                style={{ border: 0 }}
-                allowFullScreen=""
-                loading="lazy"
-                className="dark:grayscale"
-              ></iframe>
+            <div className="rounded-[2.5rem] overflow-hidden bg-[#F5F5F7] dark:bg-[#111] p-4">
+              <div className="rounded-[2rem] overflow-hidden">
+                <iframe
+                  src="https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d345.16491201282525!2d-72.69499679023498!3d-12.882904768184062!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2s!5e1!3m2!1ses-419!2spe!4v1747105295603!5m2!1ses-419!2spe"
+                  width="100%"
+                  height="300"
+                  style={{ border: 0 }}
+                  allowFullScreen=""
+                  loading="lazy"
+                  className="dark:grayscale opacity-90 hover:opacity-100 transition-opacity duration-500"
+                ></iframe>
+              </div>
             </div>
 
-            {/* FAQ Section */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Preguntas Frecuentes</h3>
-              <div className="space-y-4">
-                <div>
-                  <h4 className="text-sm font-medium text-gray-900 dark:text-white">¿Cuánto tiempo tardan en responder?</h4>
-                  <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">Normalmente respondemos en un plazo de 24-48 horas hábiles.</p>
-                </div>
-                <div>
-                  <h4 className="text-sm font-medium text-gray-900 dark:text-white">¿Ofrecen soporte técnico?</h4>
-                  <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">Sí, nuestro equipo de soporte técnico está disponible de lunes a viernes de 9:00 a 18:00.</p>
-                </div>
-                <div>
-                  <h4 className="text-sm font-medium text-gray-900 dark:text-white">¿Puedo programar una cita?</h4>
-                  <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">Sí, puedes programar una cita a través de nuestro formulario de contacto o llamándonos directamente.</p>
-                </div>
+            {/* FAQ Section Mejorada */}
+            <div className="bg-[#F5F5F7] dark:bg-[#111] rounded-[2.5rem] p-10 lg:p-14">
+              <div className="mb-10">
+                <h2 className="text-3xl font-light tracking-tighter text-black dark:text-white">
+                  Preguntas Frecuentes.
+                </h2>
+                <p className="mt-2 text-sm text-gray-500 font-light tracking-wide">
+                  Respuestas a las consultas más comunes
+                </p>
+              </div>
+
+              <div className="space-y-6">
+                {faqs.map((faq, index) => (
+                  <div 
+                    key={faq.id}
+                    className="group relative overflow-hidden rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300"
+                  >
+                    <div className="flex items-start p-6 space-x-4">
+                      <div className="flex-shrink-0">
+                        <div className="h-8 w-8 bg-indigo-100 dark:bg-indigo-900 rounded-full flex items-center justify-center">
+                          <span className="text-indigo-600 dark:text-indigo-400 font-semibold">
+                            {index + 1}
+                          </span>
+                        </div>
+                      </div>
+                      
+                      <div className="flex-1">
+                        <h3 className="text-sm font-medium tracking-wide text-black dark:text-white flex items-center justify-between">
+                          {faq.question}
+                          <ChevronDownIcon className="h-4 w-4 text-gray-400 transform group-hover:rotate-180 transition-transform duration-300" />
+                        </h3>
+                        <div className="mt-3">
+                          <p className="text-sm font-light text-gray-500 dark:text-gray-400 leading-relaxed">
+                            {faq.answer}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-gray-200 dark:via-gray-600 to-transparent" />
+                  </div>
+                ))}
               </div>
             </div>
           </div>

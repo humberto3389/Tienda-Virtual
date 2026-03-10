@@ -46,16 +46,23 @@ const OpinionList = ({ opinions }) => {
 
           {/* Fecha */}
           <div className="mt-4 text-sm text-gray-500 dark:text-gray-400">
-            {new Date(opinion.fecha).toLocaleDateString('es-ES', {
+            {opinion.fecha ? new Date(opinion.fecha).toLocaleDateString('es-ES', {
               year: 'numeric',
               month: 'long',
               day: 'numeric'
-            })}
+            }) : 'Fecha no disponible'}
           </div>
+          
+          {/* Mensaje de estado si la opinión está pendiente */}
+          {opinion.status === 'pending' && (
+            <div className="mt-2 text-sm text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 rounded-md px-3 py-1 inline-block">
+              <span className="font-medium">En revisión:</span> Esta opinión está pendiente de aprobación
+            </div>
+          )}
         </div>
       ))}
     </div>
   );
 };
 
-export default OpinionList; 
+export default OpinionList;

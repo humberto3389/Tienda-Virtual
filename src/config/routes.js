@@ -18,15 +18,14 @@ export const routes = {
   register: '/register',
   forgotPassword: '/forgot-password',
   resetPassword: '/reset-password',
-  verifyEmail: '/verify-email',
 
   // Protected routes
   profile: '/profile',
-
   // Admin routes
   admin: {
     dashboard: '/admin',
     products: '/admin/products',
+    productsAdvanced: '/admin/products-advanced',
     productForm: '/admin/products/new',
     productEdit: '/admin/products/:id/edit',
     categories: '/admin/categories',
@@ -36,6 +35,8 @@ export const routes = {
     messages: '/admin/messages',
     banners: '/admin/banners',
     settings: '/admin/settings',
-    seed: '/admin/seed'
+    seed: '/admin/seed',
+    terms: '/admin/legal/terms',
+    privacy: '/admin/legal/privacy'
   }
 };

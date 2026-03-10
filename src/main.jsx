@@ -4,10 +4,11 @@ import { BrowserRouter as Router } from 'react-router-dom'
 import App from './App'
 import './index.css'
 import { ThemeProvider } from './context/ThemeContext'
-import { AuthProvider } from './context/AuthContext'
+import { AuthProvider } from './context/auth/AuthContext'
 
-ReactDOM.createRoot(document.getElementById('root')).render(
-  <Router>
+// Enable React Router v7 future flags
+const router = (
+  <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
     <ThemeProvider>
       <AuthProvider>
         <App />
@@ -15,3 +16,5 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     </ThemeProvider>
   </Router>
 )
+
+ReactDOM.createRoot(document.getElementById('root')).render(router)
