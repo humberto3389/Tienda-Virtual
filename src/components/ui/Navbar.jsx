@@ -11,6 +11,8 @@ import {
 } from '@heroicons/react/24/outline';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/auth/AuthContext';
+import { productService } from '../../services/productService';
+import { formatPrice } from '../../utils/formatPrice';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -19,6 +21,8 @@ const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [hoveredItem, setHoveredItem] = useState(null);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+  const [suggestions, setSuggestions] = useState([]);
+  const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
   const { darkMode, toggleDarkMode } = useTheme();
   const auth = useAuth();
   const navigate = useNavigate();
@@ -32,8 +36,42 @@ const Navbar = () => {
       navigate(`/shop?search=${encodeURIComponent(searchQuery.trim())}`);
       setSearchOpen(false);
       setSearchQuery('');
+      setSuggestions([]);
     }
   };
+
+  const handleSuggestionClick = (product) => {
+    navigate(`/product/${product.id}`);
+    setSearchOpen(false);
+    setSearchQuery('');
+    setSuggestions([]);
+  };
+
+  useEffect(() => {
+    const timer = setTimeout(async () => {
+      if (searchQuery.trim().length > 1) {
+        setIsLoadingSuggestions(true);
+        try {
+          const result = await productService.getProducts({
+            search: searchQuery.trim(),
+            limit: 5,
+            is_active: true
+          });
+          if (result.success) {
+            setSuggestions(result.data);
+          }
+        } catch (error) {
+          console.error('Error fetching suggestions:', error);
+        } finally {
+          setIsLoadingSuggestions(false);
+        }
+      } else {
+        setSuggestions([]);
+      }
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -143,6 +181,36 @@ const Navbar = () => {
                     <MagnifyingGlassIcon className="h-5 w-5" />
                   </button>
                 </form>
+
+                {/* Suggestions List (Desktop) */}
+                {(suggestions.length > 0 || isLoadingSuggestions) && (
+                  <div className="border-t border-gray-100 dark:border-white/5 max-h-80 overflow-y-auto">
+                    {isLoadingSuggestions ? (
+                      <div className="p-4 text-center">
+                        <div className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-solid border-[#3F96FC] border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"></div>
+                        <span className="ml-3 text-[10px] tracking-widest text-gray-400 uppercase">Buscando...</span>
+                      </div>
+                    ) : (
+                      <div className="py-2">
+                        {suggestions.map((product) => (
+                          <button
+                            key={product.id}
+                            onClick={() => handleSuggestionClick(product)}
+                            className="w-full flex items-center px-4 py-3 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors text-left group"
+                          >
+                            <div className="w-10 h-10 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 flex-shrink-0">
+                              <img src={product.image_url} alt={product.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                            </div>
+                            <div className="ml-3 overflow-hidden">
+                              <p className="text-sm font-medium text-black dark:text-white truncate">{product.name}</p>
+                              <p className="text-[10px] text-[#3F96FC] font-medium tracking-wide">{formatPrice(product.price)}</p>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
 
@@ -266,6 +334,36 @@ const Navbar = () => {
                     <MagnifyingGlassIcon className="h-4 w-4" />
                   </button>
                 </form>
+
+                {/* Suggestions List (Mobile) */}
+                {(suggestions.length > 0 || isLoadingSuggestions) && (
+                  <div className="border-t border-gray-100 dark:border-white/5 max-h-64 overflow-y-auto">
+                    {isLoadingSuggestions ? (
+                      <div className="p-4 text-center">
+                        <div className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-solid border-[#3F96FC] border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"></div>
+                        <span className="ml-3 text-[10px] tracking-widest text-gray-400 uppercase">Buscando...</span>
+                      </div>
+                    ) : (
+                      <div className="py-2">
+                        {suggestions.map((product) => (
+                          <button
+                            key={product.id}
+                            onClick={() => handleSuggestionClick(product)}
+                            className="w-full flex items-center px-4 py-3 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors text-left"
+                          >
+                            <div className="w-10 h-10 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 flex-shrink-0">
+                              <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" />
+                            </div>
+                            <div className="ml-3 overflow-hidden">
+                              <p className="text-xs font-medium text-black dark:text-white truncate">{product.name}</p>
+                              <p className="text-[10px] text-[#3F96FC] font-medium tracking-wide">{formatPrice(product.price)}</p>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
             <button
