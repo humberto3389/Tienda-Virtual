@@ -228,6 +228,9 @@ export default function Shop() {
   const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || '');
   const [sortBy, setSortBy] = useState(searchParams.get('sort') || 'newest');
   const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
+  const [inputValue, setInputValue] = useState(searchParams.get('search') || '');
+  const [suggestions, setSuggestions] = useState([]);
+  const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [priceRange, setPriceRange] = useState({
     min: searchParams.get('minPrice') || '',
@@ -265,11 +268,62 @@ export default function Shop() {
 
   // Sincronizar búsqueda desde el Navbar (URL)
   useEffect(() => {
-    const query = searchParams.get('search');
-    if (query !== null) {
-      setSearchQuery(query);
-    }
+    const query = searchParams.get('search') || '';
+    setSearchQuery(query);
+    setInputValue(query);
   }, [searchParams]);
+
+  // Lógica de sugerencias (igual que en Navbar)
+  useEffect(() => {
+    const timer = setTimeout(async () => {
+      if (inputValue.trim().length > 1) {
+        setIsLoadingSuggestions(true);
+        try {
+          const result = await productService.getProducts({
+            search: inputValue.trim(),
+            limit: 5,
+            is_active: true
+          });
+          if (result.success) {
+            setSuggestions(result.data);
+          }
+        } catch (error) {
+          console.error('Error fetching suggestions:', error);
+        } finally {
+          setIsLoadingSuggestions(false);
+        }
+      } else {
+        setSuggestions([]);
+      }
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [inputValue]);
+
+  const handleSearchSubmit = (e) => {
+    if (e) e.preventDefault();
+    if (inputValue.trim() !== searchQuery) {
+      setSearchQuery(inputValue.trim());
+      setSearchParams({ 
+        ...Object.fromEntries(searchParams), 
+        search: inputValue.trim(),
+        page: 1 
+      });
+      setSuggestions([]);
+    }
+  };
+
+  const handleSuggestionClick = (product) => {
+    const productName = product.name;
+    setInputValue(productName);
+    setSearchQuery(productName);
+    setSearchParams({ 
+      ...Object.fromEntries(searchParams), 
+      search: productName,
+      page: 1 
+    });
+    setSuggestions([]);
+  };
 
   const loadCategories = async () => {
     try {
@@ -506,17 +560,48 @@ export default function Shop() {
       <div className="bg-white dark:bg-[#0a0a0f] border-b border-gray-100 dark:border-white/5">
         <div className="container mx-auto px-4 py-4">
           <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-            <div className="w-full md:w-96">
-              <div className="relative">
+            <div className="w-full md:w-96 relative group/search">
+              <form onSubmit={handleSearchSubmit} className="relative">
                 <input
                   type="text"
-                  placeholder="Buscar productos..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="¿Qué estás buscando en la tienda?"
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
                   className="w-full pl-10 pr-4 py-2.5 bg-gray-50 dark:bg-[#0f0f14] border-gray-100 dark:border-white/10 text-sm font-light text-gray-900 dark:text-white rounded-full focus:border-[#3F96FC] dark:focus:ring-[#3F96FC]/30 transition-all outline-none"
                 />
                 <MagnifyingGlassIcon className="h-4 w-4 text-gray-400 dark:text-[#3F96FC]/50 absolute left-3.5 top-3.5" />
-              </div>
+                <button type="submit" className="hidden">Buscar</button>
+              </form>
+
+              {/* Suggestions List (Shop Page) */}
+              {(suggestions.length > 0 || isLoadingSuggestions) && (
+                <div className="absolute top-full left-0 mt-2 w-full rounded-2xl bg-white dark:bg-[#1f1f23] shadow-2xl border border-gray-100 dark:border-white/10 overflow-hidden z-[100] transform transition-all animate-fadeIn">
+                  {isLoadingSuggestions ? (
+                    <div className="p-4 text-center">
+                      <div className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-solid border-[#3F96FC] border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"></div>
+                      <span className="ml-3 text-[10px] tracking-widest text-gray-400 uppercase">Buscando...</span>
+                    </div>
+                  ) : (
+                    <div className="py-2">
+                      {suggestions.map((product) => (
+                        <button
+                          key={product.id}
+                          onClick={() => handleSuggestionClick(product)}
+                          className="w-full flex items-center px-4 py-3 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors text-left group/item"
+                        >
+                          <div className="w-10 h-10 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 flex-shrink-0">
+                            <img src={product.image_url} alt={product.name} className="w-full h-full object-cover group-hover/item:scale-110 transition-transform duration-500" />
+                          </div>
+                          <div className="ml-3 overflow-hidden">
+                            <p className="text-sm font-medium text-black dark:text-white truncate">{product.name}</p>
+                            <p className="text-[10px] text-[#3F96FC] font-medium tracking-wide">{formatPrice(product.price)}</p>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
             
             <div className="flex items-center gap-4">
