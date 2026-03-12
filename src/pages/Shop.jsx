@@ -501,9 +501,9 @@ export default function Shop() {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#121212]">
+    <div className="min-h-screen bg-white dark:bg-[#0a0a0f] transition-colors duration-500">
       {/* Barra de Búsqueda y Filtros */}
-      <div className="bg-white dark:bg-[#121212] border-b border-gray-100 dark:border-gray-800">
+      <div className="bg-white dark:bg-[#0a0a0f] border-b border-gray-100 dark:border-white/5">
         <div className="container mx-auto px-4 py-4">
           <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
             <div className="w-full md:w-96">
@@ -513,9 +513,9 @@ export default function Shop() {
                   placeholder="Buscar productos..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-800/50 border-gray-100 dark:border-gray-700 text-sm font-light text-gray-900 dark:text-white rounded-full focus:border-[#3F96FC] transition-colors outline-none"
+                  className="w-full pl-10 pr-4 py-2.5 bg-gray-50 dark:bg-[#0f0f14] border-gray-100 dark:border-white/10 text-sm font-light text-gray-900 dark:text-white rounded-full focus:border-[#3F96FC] dark:focus:ring-[#3F96FC]/30 transition-all outline-none"
                 />
-                <MagnifyingGlassIcon className="h-4 w-4 text-gray-400 absolute left-3.5 top-3" />
+                <MagnifyingGlassIcon className="h-4 w-4 text-gray-400 dark:text-[#3F96FC]/50 absolute left-3.5 top-3.5" />
               </div>
             </div>
             
@@ -531,7 +531,7 @@ export default function Shop() {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="bg-white dark:bg-[#121212] border border-gray-100 dark:border-gray-800 px-5 py-2 rounded-full text-xs font-light text-gray-600 dark:text-gray-400 focus:border-[#3F96FC] outline-none"
+                className="bg-white dark:bg-[#0a0a0f] border border-gray-100 dark:border-white/10 px-5 py-2.5 rounded-full text-xs font-light text-gray-600 dark:text-gray-400 focus:border-[#3F96FC] outline-none transition-all"
               >
                 <option value="newest">Más recientes</option>
                 <option value="price_asc">Precio: Menor a Mayor</option>
@@ -548,7 +548,7 @@ export default function Shop() {
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Sidebar de Categorías */}
           <aside className={`lg:block w-full lg:w-64 ${showFilters ? 'block' : 'hidden'}`}>
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+            <div className="bg-white dark:bg-[#0f0f14] rounded-3xl shadow-sm p-6 border border-transparent dark:border-white/5 transition-all">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Categorías</h2>
                 <button
@@ -587,7 +587,7 @@ export default function Shop() {
             
             <div className="grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-3 xl:gap-x-8">
               {products.map((product) => (
-                <div key={product.id} className="group relative bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                <div key={product.id} className="group relative bg-white dark:bg-[#0f0f14] rounded-3xl shadow-md overflow-hidden hover:shadow-xl dark:hover:shadow-[#3F96FC]/10 transition-all duration-500 border border-transparent dark:border-white/5">
                   {/* Badge de descuento */}
                   {product.discount > 0 && (
                     <div className="absolute top-4 right-4 bg-[#FF854D] text-white text-[10px] px-3 py-1.5 rounded-full font-light tracking-wider z-10">

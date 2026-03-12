@@ -27,40 +27,59 @@
   }
 
   .dark {
-    --background: 0 0% 7%; /* #121212 */
+    --background: 240 15% 4%; /* Deep Midnight */
     --foreground: 0 0% 100%;
-    --card: 0 0% 12%; /* #1E1E1E */
+    --card: 240 12% 7%;
     --card-foreground: 0 0% 100%;
-    --popover: 0 0% 12%;
+    --popover: 240 12% 7%;
     --popover-foreground: 0 0% 100%;
     --primary: 212 97% 62%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 232 7% 23%; /* Carbon background for some elements */
+    --secondary: 240 10% 12%;
     --secondary-foreground: 0 0% 100%;
-    --muted: 0 0% 12%;
-    --muted-foreground: 0 0% 69%;
+    --muted: 240 10% 12%;
+    --muted-foreground: 240 5% 75%;
     --accent: 19 100% 65%;
     --accent-foreground: 0 0% 100%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 0 0% 15%; /* #262626 */
-    --input: 0 0% 15%;
+    --destructive: 0 62.8% 30.6%; /* Kept original destructive values */
+    --destructive-foreground: 0 0% 100%; /* Kept original destructive values */
+    --border: 240 10% 15%;
+    --input: 240 10% 15%;
     --ring: 212 97% 62%;
+  }
+
+  /* Magical Glow & Glass Utilities */
+  .dark .glow-primary {
+    box-shadow: 0 0 20px -5px rgba(63, 150, 252, 0.4);
+  }
+  .dark .glow-accent {
+    box-shadow: 0 0 20px -5px rgba(255, 133, 77, 0.4);
+  }
+  .dark .glass-vibrant {
+    background: rgba(15, 15, 20, 0.7);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .dark .text-gradient-vibrant {
+    background: linear-gradient(135deg, #3F96FC 0%, #FF854D 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
   }
 
   /* Structural overrides to match Home.jsx's minimalist approach globally */
   .dark .bg-gray-900 {
-    background-color: #121212 !important;
+    background-color: hsl(240 15% 4%) !important;
   }
   .dark .bg-gray-800 {
-    background-color: #1E1E1E !important;
+    background-color: hsl(240 12% 7%) !important;
   }
   .dark .bg-gray-50 {
-    background-color: #121212 !important;
+    background-color: hsl(240 15% 4%) !important;
   }
   /* Newsletter/Footer Carbon style override */
   .dark .footer-carbon, .dark .bg-slate-900 {
-     background-color: #37383F !important;
+     background-color: hsl(240 10% 10%) !important;
+     border-top: 1px solid rgba(63, 150, 252, 0.1);
   }
 }
 

@@ -107,8 +107,9 @@ const Navbar = () => {
   ];
 
   return (
-    <header className={`sticky top-0 z-50 transition-all duration-500 ${scrolled ? 'py-2' : 'py-4'}`}>
-      <div className="absolute inset-0 bg-white/80 dark:bg-[#18181b]/80 backdrop-blur-xl border-b border-gray-200/50 dark:border-white/5 transition-colors duration-500"></div>
+    <header className={`sticky top-0 z-50 transition-all duration-500 ${scrolled ? 'py-1' : 'py-3'}`}>
+      <div className={`absolute inset-0 transition-colors duration-500 ${scrolled ? 'bg-white/80 dark:bg-[#0a0a0f]/80 backdrop-blur-2xl' : 'bg-transparent'}`}></div>
+      <div className={`absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-gray-200/50 dark:via-[#3F96FC]/20 to-transparent transition-opacity duration-500 ${scrolled ? 'opacity-100' : 'opacity-0'}`}></div>
 
       <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16 rounded-full bg-transparent">
@@ -128,7 +129,7 @@ const Navbar = () => {
 
           {/* Desktop Navigation */}
           <nav className="hidden xl:flex h-full items-center justify-center flex-1 mx-4">
-            <div className="flex items-center space-x-1 xl:space-x-2 bg-white/50 dark:bg-black/20 backdrop-blur-md px-2 py-1.5 rounded-full border border-gray-200/50 dark:border-white/5">
+            <div className="flex items-center space-x-1 xl:space-x-2 bg-white/40 dark:bg-white/5 backdrop-blur-xl px-2 py-1.5 rounded-full border border-gray-200/50 dark:border-white/10 shadow-sm dark:shadow-[#3F96FC]/5">
               {navItems.map((item) => (
                 <div
                   key={item.path}
@@ -175,7 +176,7 @@ const Navbar = () => {
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Buscar productos..."
                     autoFocus={searchOpen}
-                    className="w-full bg-gray-50 dark:bg-[#111] border-none rounded-2xl text-sm font-light tracking-wide text-black dark:text-white px-5 py-4 focus:ring-2 focus:ring-[#3F96FC]/50 dark:focus:ring-[#3F96FC]/50 transition-all"
+                    className="w-full bg-gray-50 dark:bg-[#050508] border-none rounded-2xl text-sm font-light tracking-wide text-black dark:text-white px-5 py-4 focus:ring-2 focus:ring-[#3F96FC]/50 transition-all"
                   />
                   <button type="submit" className="absolute right-4 top-1/2 -translate-y-1/2 p-2 text-gray-400 hover:text-[#3F96FC] transition-colors">
                     <MagnifyingGlassIcon className="h-5 w-5" />
@@ -392,10 +393,12 @@ const Navbar = () => {
 
       {/* Mobile Navigation Panel */}
       <div
-        className={`xl:hidden fixed inset-0 top-[4rem] z-40 bg-white/95 dark:bg-[#18181b]/95 backdrop-blur-2xl transition-all duration-500 origin-top transform ${isOpen ? 'scale-y-100 opacity-100' : 'scale-y-0 opacity-0 pointer-events-none'
+        className={`xl:hidden fixed inset-0 top-[4rem] z-40 bg-white/95 dark:bg-[#0a0a0f]/95 backdrop-blur-3xl transition-all duration-500 origin-top transform ${isOpen ? 'scale-y-100 opacity-100' : 'scale-y-0 opacity-0 pointer-events-none'
           }`}
       >
-        <div className="flex flex-col p-8 h-full overflow-y-auto">
+        <div className="flex flex-col p-8 h-full overflow-y-auto relative">
+          {/* Subtle background glow for mobile menu */}
+          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-64 h-64 bg-[#3F96FC]/10 blur-[120px] rounded-full pointer-events-none dark:block hidden"></div>
 
           <div className="flex flex-col space-y-4 mt-4 text-center">
             {navItems.map((item) => (
