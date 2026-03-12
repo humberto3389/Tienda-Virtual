@@ -232,7 +232,7 @@ const Navbar = () => {
                   <img
                     src={profile?.avatar_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'}
                     alt={profile?.nombre}
-                    className="w-8 h-8 rounded-full object-cover grayscale transition-transform duration-300 hover:grayscale-0"
+                    className="w-8 h-8 rounded-full object-cover transition-transform duration-300 hover:scale-110"
                   />
                   <ChevronDownIcon className="w-3 h-3 text-gray-400" />
                 </button>
@@ -243,7 +243,7 @@ const Navbar = () => {
                       <img
                         src={profile?.avatar_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'}
                         alt={profile?.nombre}
-                        className="w-16 h-16 rounded-full object-cover mx-auto mb-3 grayscale"
+                        className="w-16 h-16 rounded-full object-cover mx-auto mb-3"
                       />
                       <h4 className="text-sm font-medium text-black dark:text-white tracking-wide">
                         {profile ? `${profile.nombre} ${profile.apellido}` : 'Usuario'}
@@ -422,7 +422,7 @@ const Navbar = () => {
                   <img
                     src={profile?.avatar_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'}
                     alt="Perfil"
-                    className="w-12 h-12 rounded-full object-cover grayscale"
+                    className="w-12 h-12 rounded-full object-cover"
                   />
                   <div>
                     <span className="block font-medium text-black dark:text-white tracking-wide">
