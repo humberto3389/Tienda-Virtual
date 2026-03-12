@@ -320,43 +320,51 @@ const Navbar = () => {
               </button>
 
               {/* Mobile Search Input Overlay */}
-              <div className={`absolute top-full right-0 mt-4 w-[calc(100vw-2rem)] sm:w-80 rounded-2xl bg-white/90 dark:bg-[#1f1f23]/90 backdrop-blur-2xl shadow-2xl border border-gray-100 dark:border-white/10 overflow-hidden transform transition-all duration-300 origin-top-right z-50 ${searchOpen ? 'scale-100 opacity-100 visible' : 'scale-95 opacity-0 invisible'}`}>
-                <form onSubmit={handleSearch} className="relative p-2">
+              <div className={`fixed md:absolute top-20 md:top-full right-4 md:right-0 w-[calc(100vw-2rem)] md:w-96 rounded-3xl bg-white/95 dark:bg-[#1f1f23]/95 backdrop-blur-2xl shadow-2xl border border-gray-100 dark:border-white/10 overflow-hidden transform transition-all duration-300 origin-top-right z-50 ${searchOpen ? 'scale-100 opacity-100 visible' : 'scale-95 opacity-0 invisible'}`}>
+                <form onSubmit={handleSearch} className="relative p-3">
                   <input
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Buscar productos..."
+                    placeholder="¿Qué estás buscando?"
                     autoFocus={searchOpen}
-                    className="w-full bg-gray-50 dark:bg-[#111] border-none rounded-xl text-sm font-light tracking-wide text-black dark:text-white px-4 py-3 focus:ring-2 focus:ring-[#3F96FC]/50 transition-all"
+                    className="w-full bg-gray-50/50 dark:bg-[#111] border-none rounded-2xl text-base font-light tracking-wide text-black dark:text-white px-5 py-4 focus:ring-2 focus:ring-[#3F96FC]/50 transition-all"
                   />
-                  <button type="submit" className="absolute right-4 top-1/2 -translate-y-1/2 p-2 text-gray-400 hover:text-[#3F96FC] transition-colors">
-                    <MagnifyingGlassIcon className="h-4 w-4" />
+                  <button type="submit" className="absolute right-6 top-1/2 -translate-y-1/2 p-2 text-gray-400 hover:text-[#3F96FC] transition-colors">
+                    <MagnifyingGlassIcon className="h-5 w-5" />
                   </button>
                 </form>
 
                 {/* Suggestions List (Mobile) */}
                 {(suggestions.length > 0 || isLoadingSuggestions) && (
-                  <div className="border-t border-gray-100 dark:border-white/5 max-h-64 overflow-y-auto">
+                  <div className="border-t border-gray-100 dark:border-white/5 max-h-[60vh] overflow-y-auto">
                     {isLoadingSuggestions ? (
-                      <div className="p-4 text-center">
-                        <div className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-solid border-[#3F96FC] border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"></div>
-                        <span className="ml-3 text-[10px] tracking-widest text-gray-400 uppercase">Buscando...</span>
+                      <div className="p-8 text-center">
+                        <div className="inline-block h-5 w-5 animate-spin rounded-full border-2 border-solid border-[#3F96FC] border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"></div>
+                        <p className="mt-3 text-[10px] tracking-[0.2em] text-gray-400 uppercase font-medium">Buscando productos...</p>
                       </div>
                     ) : (
                       <div className="py-2">
+                        <div className="px-5 py-2">
+                          <p className="text-[9px] tracking-[0.2em] text-gray-400 uppercase font-bold">Resultados sugeridos</p>
+                        </div>
                         {suggestions.map((product) => (
                           <button
                             key={product.id}
                             onClick={() => handleSuggestionClick(product)}
-                            className="w-full flex items-center px-4 py-3 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors text-left"
+                            className="w-full flex items-center px-5 py-4 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors text-left border-b border-gray-50 dark:border-white/5 last:border-0"
                           >
-                            <div className="w-10 h-10 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 flex-shrink-0">
+                            <div className="w-12 h-12 rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-800 flex-shrink-0 border border-gray-100 dark:border-white/5">
                               <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" />
                             </div>
-                            <div className="ml-3 overflow-hidden">
-                              <p className="text-xs font-medium text-black dark:text-white truncate">{product.name}</p>
-                              <p className="text-[10px] text-[#3F96FC] font-medium tracking-wide">{formatPrice(product.price)}</p>
+                            <div className="ml-4 overflow-hidden flex-1">
+                              <p className="text-sm font-medium text-black dark:text-white truncate">{product.name}</p>
+                              <div className="flex items-center mt-0.5">
+                                <p className="text-[11px] text-[#3F96FC] font-semibold tracking-wide">{formatPrice(product.price)}</p>
+                                {product.discount > 0 && (
+                                  <span className="ml-2 text-[9px] text-orange-500 font-bold bg-orange-50 dark:bg-orange-500/10 px-1.5 py-0.5 rounded uppercase">-{product.discount}%</span>
+                                )}
+                              </div>
                             </div>
                           </button>
                         ))}
