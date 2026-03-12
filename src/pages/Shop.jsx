@@ -263,6 +263,14 @@ export default function Shop() {
     loadProducts();
   }, [currentPage, selectedCategory, sortBy, searchQuery, priceRange]);
 
+  // Sincronizar búsqueda desde el Navbar (URL)
+  useEffect(() => {
+    const query = searchParams.get('search');
+    if (query !== null) {
+      setSearchQuery(query);
+    }
+  }, [searchParams]);
+
   const loadCategories = async () => {
     try {
       const result = await productService.getCategories();

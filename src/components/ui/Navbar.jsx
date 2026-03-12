@@ -240,14 +240,34 @@ const Navbar = () => {
 
           {/* Mobile Actions & Menu Button */}
           <div className="xl:hidden flex items-center space-x-2 md:space-x-4 z-10">
-            {/* Mobile Search Button */}
-            <button
-              onClick={toggleSearch}
-              className="p-2 rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors"
-            >
-              <MagnifyingGlassIcon className={`h-6 w-6 ${searchOpen ? 'transform rotate-90 opacity-0 absolute' : 'transform rotate-0 opacity-100 transition-all duration-300'}`} />
-              <XMarkIcon className={`h-6 w-6 ${searchOpen ? 'transform rotate-0 opacity-100 transition-all duration-300' : 'transform -rotate-90 opacity-0 absolute'}`} />
-            </button>
+            {/* Mobile Search Button & Input */}
+            <div className="relative flex items-center">
+              <button
+                onClick={toggleSearch}
+                className="p-2 rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors"
+                aria-label="Buscar"
+              >
+                <MagnifyingGlassIcon className={`h-6 w-6 transition-all duration-300 ${searchOpen ? 'transform rotate-90 opacity-0 absolute' : 'transform rotate-0 opacity-100'}`} />
+                <XMarkIcon className={`h-6 w-6 transition-all duration-300 ${searchOpen ? 'transform rotate-0 opacity-100' : 'transform -rotate-90 opacity-0 absolute'}`} />
+              </button>
+
+              {/* Mobile Search Input Overlay */}
+              <div className={`absolute top-full right-0 mt-4 w-[calc(100vw-2rem)] sm:w-80 rounded-2xl bg-white/90 dark:bg-[#1f1f23]/90 backdrop-blur-2xl shadow-2xl border border-gray-100 dark:border-white/10 overflow-hidden transform transition-all duration-300 origin-top-right z-50 ${searchOpen ? 'scale-100 opacity-100 visible' : 'scale-95 opacity-0 invisible'}`}>
+                <form onSubmit={handleSearch} className="relative p-2">
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Buscar productos..."
+                    autoFocus={searchOpen}
+                    className="w-full bg-gray-50 dark:bg-[#111] border-none rounded-xl text-sm font-light tracking-wide text-black dark:text-white px-4 py-3 focus:ring-2 focus:ring-[#3F96FC]/50 transition-all"
+                  />
+                  <button type="submit" className="absolute right-4 top-1/2 -translate-y-1/2 p-2 text-gray-400 hover:text-[#3F96FC] transition-colors">
+                    <MagnifyingGlassIcon className="h-4 w-4" />
+                  </button>
+                </form>
+              </div>
+            </div>
             <button
               onClick={toggleDarkMode}
               className="p-2 rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors"
