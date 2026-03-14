@@ -284,7 +284,7 @@ export default function Footer() {
                   <img 
                     src="/Logo1.png" 
                     alt="Horizon Studio Logo" 
-                    className="h-5 w-auto object-contain transition-all duration-700 group-hover:scale-110 group-hover:drop-shadow-[0_0_8px_rgba(99,102,241,0.5)]"
+                    className="h-5 w-auto object-contain rounded transition-all duration-700 group-hover:scale-110 group-hover:drop-shadow-[0_0_8px_rgba(99,102,241,0.5)]"
                   />
                   <span className={`text-sm font-bold tracking-tight transition-all duration-500 ${darkMode ? 'text-gray-100 group-hover:text-indigo-400' : 'text-gray-900 group-hover:text-indigo-600'}`}>
                     Horizon Studio
