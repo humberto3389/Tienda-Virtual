@@ -202,9 +202,9 @@ const Home = () => {
     <div className="min-h-screen bg-white dark:bg-[#0a0a0f] selection:bg-[#00E5FF]/30 transition-colors duration-700">
       {/* 1. MONUMENTAL HERO */}
       <section className="relative h-screen min-h-[800px] flex items-center justify-center overflow-hidden">
-        {/* Magic Glow Orbs for Dark Mode */}
-        <div className="absolute top-1/4 -left-20 w-[500px] h-[500px] bg-[#00E5FF]/10 blur-[150px] rounded-full pointer-events-none dark:block hidden animate-pulse"></div>
-        <div className="absolute bottom-1/4 -right-20 w-[500px] h-[500px] bg-[#FF854D]/10 blur-[150px] rounded-full pointer-events-none dark:block hidden animate-pulse" style={{animationDelay: '1s'}}></div>
+        {/* Magic Glow Orbs for Dark Mode - Disabled on mobile for performance */}
+        <div className="absolute top-1/4 -left-20 w-[500px] h-[500px] bg-[#00E5FF]/10 blur-[150px] rounded-full pointer-events-none md:block hidden animate-pulse"></div>
+        <div className="absolute bottom-1/4 -right-20 w-[500px] h-[500px] bg-[#FF854D]/10 blur-[150px] rounded-full pointer-events-none md:block hidden animate-pulse" style={{animationDelay: '1s'}}></div>
         {/* Abstract Background / Parallax Feel */}
         <div className="absolute inset-0 z-0">
           {!loadingHero && heroData && (
