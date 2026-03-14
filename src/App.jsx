@@ -11,6 +11,8 @@ import Contact from './pages/Contact'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import VerifyEmail from './pages/VerifyEmail'
+import ForgotPassword from './pages/ForgotPassword'
+import ResetPassword from './pages/ResetPassword'
 import Profile from './pages/Profile'
 import NotFound from './pages/NotFound'
 import PrivateRoute from './components/auth/PrivateRoute'
@@ -50,6 +52,8 @@ function App() {
           <Route path="/contact" element={<PageLayout><Contact /></PageLayout>} />
           <Route path="/login" element={<PageLayout><Login /></PageLayout>} />
           <Route path="/register" element={<PageLayout><Register /></PageLayout>} />
+          <Route path="/forgot-password" element={<PageLayout><ForgotPassword /></PageLayout>} />
+          <Route path="/reset-password" element={<PageLayout><ResetPassword /></PageLayout>} />
           <Route path="/verify-email" element={<PageLayout><VerifyEmail /></PageLayout>} />
           <Route path="/about" element={<PageLayout><About /></PageLayout>} />
           <Route path="/blog/:id" element={<PageLayout><BlogDetail /></PageLayout>} />
