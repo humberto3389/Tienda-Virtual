@@ -156,8 +156,14 @@ export function AuthProvider({ children }) {
     return () => clearInterval(interval);
   }, [user]);
 
+  // Actualizar contraseña
+  const updatePassword = async (newPassword) => {
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    if (error) throw error;
+  };
+
   return (
-    <AuthContext.Provider value={{ user, profile, loading, login, loginWithGoogle, register, logout }}>
+    <AuthContext.Provider value={{ user, profile, loading, login, loginWithGoogle, register, logout, updatePassword }}>
       {children}
     </AuthContext.Provider>
   );

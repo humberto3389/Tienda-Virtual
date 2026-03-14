@@ -16,9 +16,14 @@ import {
 } from '@heroicons/react/24/outline';
 
 export default function Profile() {
-  const { profile, user } = useAuth();
+  const { profile, user, updatePassword } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [passwords, setPasswords] = useState({
+    newPassword: '',
+    confirmPassword: ''
+  });
   const [formData, setFormData] = useState({
     nombre: '',
     apellido: '',
@@ -54,6 +59,29 @@ export default function Profile() {
     } catch (error) {
       console.error('Error al actualizar perfil:', error);
       toast.error('Error al guardar los cambios');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePasswordUpdate = async (e) => {
+    e.preventDefault();
+    if (passwords.newPassword.length < 6) {
+      return toast.error('La contraseña debe tener al menos 6 caracteres');
+    }
+    if (passwords.newPassword !== passwords.confirmPassword) {
+      return toast.error('Las contraseñas no coinciden');
+    }
+
+    setLoading(true);
+    try {
+      await updatePassword(passwords.newPassword);
+      toast.success('Contraseña actualizada correctamente');
+      setShowPasswordModal(false);
+      setPasswords({ newPassword: '', confirmPassword: '' });
+    } catch (error) {
+      console.error('Error al cambiar contraseña:', error);
+      toast.error('Error al actualizar la contraseña');
     } finally {
       setLoading(false);
     }
@@ -231,7 +259,10 @@ export default function Profile() {
                       <PencilSquareIcon className="h-5 w-5" />
                     </button>
                   )}
-                  <button className="w-full flex items-center justify-between p-3 rounded-lg bg-indigo-50 dark:bg-gray-600/30 text-indigo-600 dark:text-purple-400 hover:bg-indigo-100 dark:hover:bg-gray-600/50 transition-colors opacity-50 cursor-not-allowed">
+                  <button 
+                    onClick={() => setShowPasswordModal(true)}
+                    className="w-full flex items-center justify-between p-3 rounded-lg bg-indigo-50 dark:bg-gray-600/30 text-indigo-600 dark:text-purple-400 hover:bg-indigo-100 dark:hover:bg-gray-600/50 transition-colors"
+                  >
                     <span>Cambiar Contraseña</span>
                     <LockClosedIcon className="h-5 w-5" />
                   </button>
@@ -260,6 +291,63 @@ export default function Profile() {
           </button>
         )}
       </div>
+
+      {/* Change Password Modal */}
+      {showPasswordModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-all duration-300">
+          <div className="w-full max-w-md bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-white/20 dark:border-gray-700 p-8 transform animate-in fade-in zoom-in duration-200">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white tracking-tight">Cambiar Contraseña</h3>
+              <button 
+                onClick={() => setShowPasswordModal(false)}
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-white transition-colors"
+              >
+                <XMarkIcon className="h-6 w-6" />
+              </button>
+            </div>
+            <form onSubmit={handlePasswordUpdate} className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Nueva Contraseña</label>
+                <input
+                  type="password"
+                  required
+                  value={passwords.newPassword}
+                  onChange={(e) => setPasswords(prev => ({ ...prev, newPassword: e.target.value }))}
+                  className="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-900 dark:text-white transition-all"
+                  placeholder="Mínimo 6 caracteres"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Confirmar Contraseña</label>
+                <input
+                  type="password"
+                  required
+                  value={passwords.confirmPassword}
+                  onChange={(e) => setPasswords(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                  className="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-900 dark:text-white transition-all"
+                  placeholder="Mínimo 6 caracteres"
+                />
+              </div>
+              <div className="pt-4 flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setShowPasswordModal(false)}
+                  className="flex-1 px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all font-medium"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="flex-1 bg-indigo-600 text-white px-4 py-3 rounded-xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200 dark:shadow-none disabled:opacity-50"
+                >
+                  {loading ? 'Cambiando...' : 'Cambiar'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
