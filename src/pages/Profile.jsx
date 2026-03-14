@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
+import { useAuth } from '../context/auth/AuthContext';
+import { userService } from '../services/userService';
 import { 
   UserCircleIcon, 
   Cog6ToothIcon,
@@ -8,22 +10,56 @@ import {
   GlobeAltIcon,
   LockClosedIcon,
   ChartBarIcon,
-  PencilSquareIcon
+  PencilSquareIcon,
+  CheckIcon,
+  XMarkIcon
 } from '@heroicons/react/24/outline';
 
 export default function Profile() {
-  const [userData] = useState({
-    name: 'Alexandra Smith',
-    title: 'Senior Product Designer',
-    email: 'alex@example.com',
-    phone: '+1 (555) 123-4567',
-    location: 'New York, USA',
-    stats: {
-      projects: 42,
-      contributions: 128,
-      efficiency: '98%'
-    }
+  const { profile, user } = useAuth();
+  const [isEditing, setIsEditing] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    nombre: '',
+    apellido: '',
+    title: '',
+    phone: '',
+    location: ''
   });
+
+  useEffect(() => {
+    if (profile) {
+      setFormData({
+        nombre: profile.nombre || '',
+        apellido: profile.apellido || '',
+        title: profile.title || '',
+        phone: profile.phone || '',
+        location: profile.location || ''
+      });
+    }
+  }, [profile]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSave = async () => {
+    if (!user) return;
+    setLoading(true);
+    try {
+      await userService.updateUser(user.id, formData);
+      toast.success('Perfil actualizado correctamente');
+      setIsEditing(false);
+    } catch (error) {
+      console.error('Error al actualizar perfil:', error);
+      toast.error('Error al guardar los cambios');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!profile) return null;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center p-4">
@@ -42,14 +78,46 @@ export default function Profile() {
             <div className="relative z-10">
               <div className="relative inline-block group">
                 <div className="h-32 w-32 rounded-full border-4 border-white/20 bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-gray-700 dark:to-gray-800 p-1 mx-auto overflow-hidden shadow-xl hover:scale-105 transition-transform duration-300">
-                  <UserCircleIcon className="h-full w-full text-indigo-300 dark:text-gray-600" />
+                  {profile.avatar_url ? (
+                    <img src={profile.avatar_url} alt="Profile" className="h-full w-full object-cover rounded-full" />
+                  ) : (
+                    <UserCircleIcon className="h-full w-full text-indigo-300 dark:text-gray-600" />
+                  )}
                 </div>
-                <button className="absolute bottom-0 right-0 bg-white dark:bg-gray-800 p-2 rounded-full shadow-lg hover:scale-110 transition-transform">
-                  <PencilSquareIcon className="h-5 w-5 text-indigo-600 dark:text-purple-400" />
-                </button>
               </div>
-              <h1 className="mt-6 text-3xl font-bold text-white">{userData.name}</h1>
-              <p className="text-indigo-100/90 font-medium mt-2">{userData.title}</p>
+              
+              {isEditing ? (
+                <div className="mt-6 flex flex-col items-center space-y-3">
+                  <div className="flex space-x-2">
+                    <input
+                      name="nombre"
+                      value={formData.nombre}
+                      onChange={handleChange}
+                      placeholder="Nombre"
+                      className="bg-white/20 border border-white/30 text-white placeholder-indigo-100 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-white/50 text-center"
+                    />
+                    <input
+                      name="apellido"
+                      value={formData.apellido}
+                      onChange={handleChange}
+                      placeholder="Apellido"
+                      className="bg-white/20 border border-white/30 text-white placeholder-indigo-100 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-white/50 text-center"
+                    />
+                  </div>
+                  <input
+                    name="title"
+                    value={formData.title}
+                    onChange={handleChange}
+                    placeholder="Título Profesional"
+                    className="w-full max-w-xs bg-white/20 border border-white/30 text-indigo-100 placeholder-indigo-200 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-white/50 text-center"
+                  />
+                </div>
+              ) : (
+                <>
+                  <h1 className="mt-6 text-3xl font-bold text-white">{profile.nombre} {profile.apellido}</h1>
+                  <p className="text-indigo-100/90 font-medium mt-2">{profile.title || 'Miembro de Yersiman'}</p>
+                </>
+              )}
             </div>
           </div>
 
@@ -65,37 +133,61 @@ export default function Profile() {
                 <div className="space-y-4">
                   <div className="flex items-center">
                     <EnvelopeIcon className="h-5 w-5 text-gray-500 dark:text-gray-400 mr-4" />
-                    <div>
+                    <div className="flex-grow">
                       <p className="text-sm text-gray-500 dark:text-gray-300">Email</p>
-                      <p className="text-gray-800 dark:text-white">{userData.email}</p>
+                      <p className="text-gray-800 dark:text-white">{profile.email}</p>
                     </div>
                   </div>
+                  
                   <div className="flex items-center">
                     <DevicePhoneMobileIcon className="h-5 w-5 text-gray-500 dark:text-gray-400 mr-4" />
-                    <div>
+                    <div className="flex-grow">
                       <p className="text-sm text-gray-500 dark:text-gray-300">Teléfono</p>
-                      <p className="text-gray-800 dark:text-white">{userData.phone}</p>
+                      {isEditing ? (
+                        <input
+                          name="phone"
+                          value={formData.phone}
+                          onChange={handleChange}
+                          className="w-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-800 dark:text-white"
+                        />
+                      ) : (
+                        <p className="text-gray-800 dark:text-white">{profile.phone || 'No especificado'}</p>
+                      )}
                     </div>
                   </div>
+
                   <div className="flex items-center">
                     <GlobeAltIcon className="h-5 w-5 text-gray-500 dark:text-gray-400 mr-4" />
-                    <div>
+                    <div className="flex-grow">
                       <p className="text-sm text-gray-500 dark:text-gray-300">Ubicación</p>
-                      <p className="text-gray-800 dark:text-white">{userData.location}</p>
+                      {isEditing ? (
+                        <input
+                          name="location"
+                          value={formData.location}
+                          onChange={handleChange}
+                          className="w-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-800 dark:text-white"
+                        />
+                      ) : (
+                        <p className="text-gray-800 dark:text-white">{profile.location || 'No especificado'}</p>
+                      )}
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Stats Cards */}
+              {/* Stats Cards (Mantenidos para diseño, podrían ser dinámicos luego) */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {Object.entries(userData.stats).map(([key, value]) => (
-                  <div key={key} className="bg-white/50 dark:bg-gray-700/30 p-4 rounded-xl border border-white/30 dark:border-gray-600/30 hover:shadow-md transition-shadow">
+                {[
+                  { label: 'Pedidos', value: '0', icon: ChartBarIcon },
+                  { label: 'Deseos', value: '0', icon: ChartBarIcon },
+                  { label: 'Reseñas', value: '0', icon: ChartBarIcon }
+                ].map((stat, i) => (
+                  <div key={i} className="bg-white/50 dark:bg-gray-700/30 p-4 rounded-xl border border-white/30 dark:border-gray-600/30 hover:shadow-md transition-all group/stat">
                     <div className="flex items-center">
-                      <ChartBarIcon className="h-6 w-6 text-indigo-600 dark:text-purple-400 mr-3" />
+                      <stat.icon className="h-6 w-6 text-indigo-600 dark:text-purple-400 mr-3 group-hover/stat:scale-110 transition-transform" />
                       <div>
-                        <p className="text-sm text-gray-500 dark:text-gray-300 capitalize">{key}</p>
-                        <p className="text-lg font-semibold text-gray-800 dark:text-white">{value}</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-300">{stat.label}</p>
+                        <p className="text-lg font-semibold text-gray-800 dark:text-white">{stat.value}</p>
                       </div>
                     </div>
                   </div>
@@ -103,52 +195,70 @@ export default function Profile() {
               </div>
             </div>
 
-            {/* Skills & Actions */}
+            {/* Actions */}
             <div className="space-y-6">
               <div className="bg-white/50 dark:bg-gray-700/30 p-6 rounded-xl shadow-sm border border-white/30 dark:border-gray-600/30">
                 <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-6 flex items-center">
                   <Cog6ToothIcon className="h-6 w-6 text-indigo-600 dark:text-purple-400 mr-3" />
-                  Acciones Rápidas
+                  Acciones
                 </h2>
                 <div className="space-y-4">
-                  <button className="w-full flex items-center justify-between p-3 rounded-lg bg-indigo-50 dark:bg-gray-600/30 hover:bg-indigo-100 dark:hover:bg-gray-600/50 transition-colors">
-                    <span className="text-indigo-600 dark:text-purple-400">Cambiar Contraseña</span>
-                    <LockClosedIcon className="h-5 w-5 text-indigo-600 dark:text-purple-400" />
-                  </button>
-                  <button className="w-full flex items-center justify-between p-3 rounded-lg bg-indigo-50 dark:bg-gray-600/30 hover:bg-indigo-100 dark:hover:bg-gray-600/50 transition-colors">
-                    <span className="text-indigo-600 dark:text-purple-400">Editar Perfil</span>
-                    <PencilSquareIcon className="h-5 w-5 text-indigo-600 dark:text-purple-400" />
-                  </button>
-                  <button className="w-full flex items-center justify-between p-3 rounded-lg bg-indigo-50 dark:bg-gray-600/30 hover:bg-indigo-100 dark:hover:bg-gray-600/50 transition-colors">
-                    <span className="text-indigo-600 dark:text-purple-400">Preferencias</span>
-                    <Cog6ToothIcon className="h-5 w-5 text-indigo-600 dark:text-purple-400" />
+                  {isEditing ? (
+                    <>
+                      <button 
+                        onClick={handleSave}
+                        disabled={loading}
+                        className="w-full flex items-center justify-between p-3 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200 dark:shadow-none disabled:opacity-50"
+                      >
+                        <span>{loading ? 'Guardando...' : 'Guardar Cambios'}</span>
+                        <CheckIcon className="h-5 w-5" />
+                      </button>
+                      <button 
+                        onClick={() => setIsEditing(false)}
+                        disabled={loading}
+                        className="w-full flex items-center justify-between p-3 rounded-lg bg-gray-100 dark:bg-gray-600/30 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600/50 transition-colors"
+                      >
+                        <span>Cancelar</span>
+                        <XMarkIcon className="h-5 w-5" />
+                      </button>
+                    </>
+                  ) : (
+                    <button 
+                      onClick={() => setIsEditing(true)}
+                      className="w-full flex items-center justify-between p-3 rounded-lg bg-indigo-50 dark:bg-gray-600/30 text-indigo-600 dark:text-purple-400 hover:bg-indigo-100 dark:hover:bg-gray-600/50 transition-colors"
+                    >
+                      <span>Editar Perfil</span>
+                      <PencilSquareIcon className="h-5 w-5" />
+                    </button>
+                  )}
+                  <button className="w-full flex items-center justify-between p-3 rounded-lg bg-indigo-50 dark:bg-gray-600/30 text-indigo-600 dark:text-purple-400 hover:bg-indigo-100 dark:hover:bg-gray-600/50 transition-colors opacity-50 cursor-not-allowed">
+                    <span>Cambiar Contraseña</span>
+                    <LockClosedIcon className="h-5 w-5" />
                   </button>
                 </div>
               </div>
 
-              {/* Progress Bar */}
+              {/* Account Status Card */}
               <div className="bg-white/50 dark:bg-gray-700/30 p-6 rounded-xl border border-white/30 dark:border-gray-600/30">
-                <h3 className="text-sm font-semibold text-gray-800 dark:text-white mb-3">Perfil Completo</h3>
-                <div className="relative pt-1">
-                  <div className="overflow-hidden h-2 mb-4 text-xs flex rounded-full bg-gray-200 dark:bg-gray-600">
-                    <div 
-                      style={{ width: '85%' }}
-                      className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-gradient-to-r from-indigo-500 to-purple-500 animate-pulse-striped"
-                    />
-                  </div>
-                  <span className="text-xs font-semibold text-indigo-600 dark:text-purple-400">
-                    85% COMPLETADO
-                  </span>
+                <h3 className="text-sm font-semibold text-gray-800 dark:text-white mb-3 tracking-wider uppercase opacity-60">Status de la Cuenta</h3>
+                <div className="flex items-center space-x-2">
+                  <div className="h-2 w-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]" />
+                  <span className="text-xs font-bold text-gray-600 dark:text-gray-300">ACTIVA</span>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Floating Edit Button */}
-        <button className="absolute top-4 right-4 bg-white dark:bg-gray-800 p-3 rounded-full shadow-xl hover:shadow-2xl transition-all hover:rotate-12">
-          <PencilSquareIcon className="h-6 w-6 text-indigo-600 dark:text-purple-400" />
-        </button>
+        {/* Floating Edit Button (Only visible on hover when not editing) */}
+        {!isEditing && (
+          <button 
+            onClick={() => setIsEditing(true)}
+            className="absolute top-4 right-4 bg-white/80 dark:bg-gray-800/80 p-3 rounded-full shadow-xl hover:shadow-2xl transition-all hover:rotate-12 backdrop-blur-md opacity-0 group-hover:opacity-100 border border-white/20"
+          >
+            <PencilSquareIcon className="h-6 w-6 text-indigo-600 dark:text-purple-400" />
+          </button>
+        )}
       </div>
     </div>
   );
