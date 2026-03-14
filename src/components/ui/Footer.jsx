@@ -275,19 +275,19 @@ export default function Footer() {
               </div>
             </div>
             
-            <div className="flex flex-col items-center md:items-end gap-3">
-              <div className="flex items-center space-x-3 group cursor-default">
-                <span className={`text-[10px] font-medium tracking-[0.2em] uppercase transition-colors duration-300 ${darkMode ? 'text-gray-500 group-hover:text-gray-300' : 'text-gray-400 group-hover:text-gray-600'}`}>
+            <div className="flex flex-col items-center md:items-end">
+              <div className="flex items-center gap-3 group cursor-default">
+                <span className={`text-[9px] font-medium tracking-[0.3em] uppercase transition-all duration-500 opacity-30 group-hover:opacity-60 ${darkMode ? 'text-white' : 'text-black'}`}>
                   Powered by
                 </span>
-                <div className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-gradient-to-r from-gray-50 to-white dark:from-[#1d1d20] dark:to-[#27272a] border border-gray-100 dark:border-white/10 shadow-sm transition-all duration-500 hover:shadow-indigo-500/10 hover:border-indigo-500/30 group">
+                <div className="flex items-center gap-2.5 transition-all duration-500">
                   <img 
                     src="/Logo1.png" 
                     alt="Horizon Studio Logo" 
-                    className="h-5 w-auto object-contain rounded-md transition-transform duration-500 group-hover:scale-110"
+                    className="h-4 w-auto object-contain filter grayscale contrast-125 opacity-30 transition-all duration-700 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105"
                   />
-                  <span className={`text-base font-bold tracking-tight transition-all duration-500 ${darkMode ? 'text-white' : 'text-black'} group-hover:text-indigo-500`}>
-                    Horizon Studio
+                  <span className={`text-xs font-semibold tracking-widest transition-all duration-500 ${darkMode ? 'text-white/30 group-hover:text-white' : 'text-black/30 group-hover:text-black'}`}>
+                    HORIZON STUDIO
                   </span>
                 </div>
               </div>
