@@ -277,17 +277,17 @@ export default function Footer() {
             
             <div className="flex flex-col items-center md:items-end">
               <div className="flex items-center gap-3 group cursor-default">
-                <span className={`text-[9px] font-medium tracking-[0.3em] uppercase transition-all duration-500 opacity-30 group-hover:opacity-60 ${darkMode ? 'text-white' : 'text-black'}`}>
+                <span className={`text-[9px] font-medium tracking-[0.3em] uppercase transition-all duration-500 ${darkMode ? 'text-gray-500 group-hover:text-gray-300' : 'text-gray-400 group-hover:text-gray-600'}`}>
                   Powered by
                 </span>
-                <div className="flex items-center gap-2.5 transition-all duration-500">
+                <div className="flex items-center gap-3 transition-all duration-500">
                   <img 
                     src="/Logo1.png" 
                     alt="Horizon Studio Logo" 
-                    className="h-4 w-auto object-contain filter grayscale contrast-125 opacity-30 transition-all duration-700 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105"
+                    className="h-5 w-auto object-contain transition-all duration-700 group-hover:scale-110 group-hover:drop-shadow-[0_0_8px_rgba(99,102,241,0.5)]"
                   />
-                  <span className={`text-xs font-semibold tracking-widest transition-all duration-500 ${darkMode ? 'text-white/30 group-hover:text-white' : 'text-black/30 group-hover:text-black'}`}>
-                    HORIZON STUDIO
+                  <span className={`text-sm font-bold tracking-tight transition-all duration-500 ${darkMode ? 'text-gray-100 group-hover:text-indigo-400' : 'text-gray-900 group-hover:text-indigo-600'}`}>
+                    Horizon Studio
                   </span>
                 </div>
               </div>
