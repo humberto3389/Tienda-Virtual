@@ -222,18 +222,23 @@ const Home = () => {
             (heroData?.media_type || defaultHero.media_type) === 'video' ? (
               <video
                 src={heroData?.media_url || defaultHero.media_url}
+                poster={`${defaultHero.media_url}&w=800&q=50&auto=format`}
                 autoPlay
                 loop
                 muted
                 playsInline
                 fetchpriority="high"
+                width="1920"
+                height="1080"
                 className="w-full h-full object-cover opacity-[0.85] dark:opacity-50 object-center transform scale-105"
               />
             ) : (
               <img
-                src={`${(heroData?.media_url || defaultHero.media_url).includes('?') ? (heroData?.media_url || defaultHero.media_url) : (heroData?.media_url || defaultHero.media_url) + '?auto=format&fit=crop'}&w=${window.innerWidth > 768 ? 1920 : 800}&q=80`}
+                src={`${(heroData?.media_url || defaultHero.media_url).includes('?') ? (heroData?.media_url || defaultHero.media_url) : (heroData?.media_url || defaultHero.media_url) + '?auto=format&fit=crop'}&w=${window.innerWidth > 768 ? 1920 : 600}&q=${window.innerWidth > 768 ? 80 : 50}`}
                 alt="Hero background"
                 fetchpriority="high"
+                width="1920"
+                height="1080"
                 className="w-full h-full object-cover opacity-[0.85] dark:opacity-50 object-center transform scale-105"
               />
             )
@@ -327,10 +332,14 @@ const Home = () => {
                       <div className="absolute inset-0 bg-gradient-to-br from-[#F5F5F7] to-[#EDEDEF] dark:from-[#111] dark:to-[#18181b] transition-all duration-[2s] ease-[cubic-bezier(0.25,1,0.5,1)] group-hover:scale-105"></div>
 
                       <img
-                        src={`${product.image_url || 'https://images.unsplash.com/photo-1523206489230-c012c64b2b48?auto=format&fit=crop'}&w=800&q=80`}
+                        src={product.image_url ? 
+                          `${product.image_url}${product.image_url.includes('unsplash') ? `&auto=format&fit=crop&w=${window.innerWidth > 768 ? 800 : 400}&q=${window.innerWidth > 768 ? 80 : 50}` : ''}` 
+                          : 'https://images.unsplash.com/photo-1523206489230-c012c64b2b48?auto=format&fit=crop&w=400&q=50'}
                         alt={product.name}
                         loading="lazy"
                         decoding="async"
+                        width="400"
+                        height="400"
                         className="absolute inset-0 w-full h-full object-cover object-center scale-[1.02] group-hover:scale-[1.07] transition-transform duration-[2s] ease-[cubic-bezier(0.25,1,0.5,1)] mix-blend-multiply dark:mix-blend-normal"
                       />
 
@@ -431,10 +440,12 @@ const Home = () => {
                   <div className="flex items-center gap-4 pt-8 border-t border-gray-50 dark:border-white/5">
                     <div className="relative">
                       <img 
-                        src={`${opinion.avatar}&w=100&h=100&auto=format&fit=crop`} 
+                        src={`${opinion.avatar}${opinion.avatar.includes('unsplash') ? `&w=64&h=64&auto=format&fit=crop&q=50` : ''}`} 
                         alt={opinion.nombre} 
                         loading="lazy"
                         decoding="async"
+                        width="48"
+                        height="48"
                         className="w-12 h-12 rounded-full object-cover border border-black/5 dark:border-white/10" 
                       />
                       <div className="absolute -bottom-1 -right-1 bg-green-500 w-3 h-3 rounded-full border-2 border-white dark:border-[#111]"></div>

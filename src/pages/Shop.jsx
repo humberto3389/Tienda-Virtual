@@ -590,7 +590,15 @@ export default function Shop() {
                           className="w-full flex items-center px-4 py-3 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors text-left group/item"
                         >
                           <div className="w-10 h-10 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 flex-shrink-0">
-                            <img src={product.image_url} alt={product.name} className="w-full h-full object-cover group-hover/item:scale-110 transition-transform duration-500" />
+                            <img 
+                              src={product.image_url ? 
+                                `${product.image_url}${product.image_url.includes('unsplash') ? `&auto=format&fit=crop&w=80&q=50` : ''}` 
+                                : '/placeholder-product.png'} 
+                              alt={product.name} 
+                              width="40"
+                              height="40"
+                              className="w-full h-full object-cover group-hover/item:scale-110 transition-transform duration-500" 
+                            />
                           </div>
                           <div className="ml-3 overflow-hidden">
                             <p className="text-sm font-medium text-black dark:text-white truncate">{product.name}</p>
@@ -689,8 +697,14 @@ export default function Shop() {
                   
                   <div className="w-full min-h-80 bg-gray-200 aspect-w-1 aspect-h-1 rounded-md overflow-hidden group-hover:opacity-75">
                     <img
-                      src={product.image}
+                      src={product.image ? 
+                        `${product.image}${product.image.includes('unsplash') ? `&auto=format&fit=crop&w=${window.innerWidth > 768 ? 800 : 400}&q=${window.innerWidth > 768 ? 80 : 50}` : ''}` 
+                        : '/placeholder-product.png'}
                       alt={product.name}
+                      width="400"
+                      height="400"
+                      loading="lazy"
+                      decoding="async"
                       className="w-full h-full object-center object-cover"
                     />
                   </div>

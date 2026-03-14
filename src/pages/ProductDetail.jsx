@@ -412,8 +412,14 @@ export default function ProductDetail() {
           <div className="space-y-4">
             <div className="aspect-square rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-800 shadow-sm border border-gray-100 dark:border-gray-800 relative group">
               <img
-                src={(selectedImage === 0 ? product.image_url : product.product_images[selectedImage - 1]?.image_url) || '/placeholder-product.png'}
+                src={(() => {
+                  const url = (selectedImage === 0 ? product.image_url : product.product_images[selectedImage - 1]?.image_url) || '/placeholder-product.png';
+                  return url.includes('unsplash') ? `${url}&auto=format&fit=crop&w=${window.innerWidth > 768 ? 1200 : 800}&q=${window.innerWidth > 768 ? 80 : 60}` : url;
+                })()}
                 alt={product.name}
+                width="800"
+                height="800"
+                fetchpriority="high"
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
               />
             </div>
@@ -428,8 +434,10 @@ export default function ProductDetail() {
                   }`}
                 >
                   <img
-                    src={product.image_url}
+                    src={product.image_url ? `${product.image_url}${product.image_url.includes('unsplash') ? '&w=150&h=150&auto=format&fit=crop&q=50' : ''}` : '/placeholder-product.png'}
                     alt={product.name}
+                    width="80"
+                    height="80"
                     className="w-full h-full object-cover"
                   />
                 </button>
@@ -442,8 +450,10 @@ export default function ProductDetail() {
                       }`}
                     >
                       <img
-                      src={image.image_url}
+                      src={image.image_url ? `${image.image_url}${image.image_url.includes('unsplash') ? '&w=150&h=150&auto=format&fit=crop&q=50' : ''}` : '/placeholder-product.png'}
                       alt={product.name}
+                      width="80"
+                      height="80"
                       className="w-full h-full object-cover"
                       />
                     </button>
@@ -688,8 +698,11 @@ export default function ProductDetail() {
                 <div key={opinion.id} className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
                   <div className="flex items-start space-x-4">
                     <img
-                      src={opinion.avatar}
+                      src={opinion.avatar ? `${opinion.avatar}${opinion.avatar.includes('unsplash') ? '&w=64&h=64&auto=format&fit=crop&q=50' : ''}` : '/placeholder-avatar.png'}
                       alt={opinion.nombre}
+                      width="40"
+                      height="40"
+                      loading="lazy"
                       className="w-10 h-10 rounded-full object-cover"
                     />
                     <div className="flex-1">
@@ -747,8 +760,14 @@ export default function ProductDetail() {
                   
                   <div className="w-full bg-gray-200 aspect-w-1 aspect-h-1 overflow-hidden group-hover:opacity-75">
                     <img
-                      src={relatedProduct.image_url || '/placeholder-product.png'}
+                      src={relatedProduct.image_url ? 
+                        `${relatedProduct.image_url}${relatedProduct.image_url.includes('unsplash') ? `&auto=format&fit=crop&w=400&q=50` : ''}` 
+                        : '/placeholder-product.png'}
                       alt={relatedProduct.name}
+                      width="400"
+                      height="400"
+                      loading="lazy"
+                      decoding="async"
                       className="w-full h-full object-center object-cover"
                     />
                   </div>
