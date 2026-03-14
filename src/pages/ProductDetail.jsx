@@ -391,9 +391,9 @@ export default function ProductDetail() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Breadcrumb */}
         <nav className="flex items-center space-x-2 text-[10px] tracking-widest uppercase opacity-40 mb-12">
-          <Link to="/" className="hover:text-[#3F96FC] transition-colors">Inicio</Link>
+          <Link to="/" className="hover:text-[#00E5FF] transition-colors">Inicio</Link>
           <span>/</span>
-          <Link to="/shop" className="hover:text-[#3F96FC] transition-colors">Tienda</Link>
+          <Link to="/shop" className="hover:text-[#00E5FF] transition-colors">Tienda</Link>
           <span>/</span>
           <span className={darkMode ? 'text-white' : 'text-gray-900'}>{product.name}</span>
         </nav>
@@ -424,7 +424,7 @@ export default function ProductDetail() {
                 <button
                   onClick={() => setSelectedImage(0)}
                   className={`aspect-square rounded-lg overflow-hidden border-2 transition-all duration-300 ${
-                    selectedImage === 0 ? 'border-[#3F96FC] scale-95 shadow-md' : 'border-transparent opacity-60 hover:opacity-100'
+                    selectedImage === 0 ? 'border-[#00E5FF] scale-95 shadow-md' : 'border-transparent opacity-60 hover:opacity-100'
                   }`}
                 >
                   <img
@@ -438,7 +438,7 @@ export default function ProductDetail() {
                     key={image.id || index}
                     onClick={() => setSelectedImage(index + 1)}
                     className={`aspect-square rounded-lg overflow-hidden border-2 transition-all duration-300 ${
-                      selectedImage === index + 1 ? 'border-[#3F96FC] scale-95 shadow-md' : 'border-transparent opacity-60 hover:opacity-100'
+                      selectedImage === index + 1 ? 'border-[#00E5FF] scale-95 shadow-md' : 'border-transparent opacity-60 hover:opacity-100'
                       }`}
                     >
                       <img
@@ -458,7 +458,7 @@ export default function ProductDetail() {
             {/* Header */}
                 <div>
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] tracking-[0.2em] font-medium uppercase text-[#3F96FC]">
+                <span className="text-[10px] tracking-[0.2em] font-medium uppercase text-[#00E5FF]">
                   {product.categories?.name} {product.subcategories?.name && <span className="mx-2 opacity-30">•</span>} {product.subcategories?.name}
                 </span>
                 <button
@@ -489,7 +489,7 @@ export default function ProductDetail() {
 
               {/* Precio */}
               <div className="flex items-center space-x-4 mb-8">
-                <span className="text-3xl font-light text-[#3F96FC]">
+                <span className="text-3xl font-light text-[#00E5FF]">
                   {formatPrice(finalPrice)}
                 </span>
                 {product.discount > 0 && (
@@ -591,7 +591,7 @@ export default function ProductDetail() {
                   <button
                     onClick={handleWhatsAppContact}
                     disabled={product.stock === 0}
-                    className="w-full py-4 px-6 rounded-full bg-[#3F96FC] hover:bg-[#2e7dda] text-white font-bold text-lg shadow-lg flex items-center justify-center transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:transform-none"
+                    className="w-full py-4 px-6 rounded-full bg-[#00E5FF] hover:bg-[#2e7dda] text-white font-bold text-lg shadow-lg flex items-center justify-center transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:transform-none"
                   >
                     {product.stock === 0 ? 'CONSULTAR STOCK' : 'SOLICITAR POR WHATSAPP'}
                   </button>

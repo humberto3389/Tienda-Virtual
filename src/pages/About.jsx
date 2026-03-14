@@ -103,7 +103,7 @@ const About = () => {
           </h1>
           <div className="flex items-center justify-center space-x-2 mb-8">
             <div className="h-[1px] w-8 bg-gray-200 dark:bg-gray-800"></div>
-            <div className="h-1 w-1 rounded-full bg-[#3F96FC]"></div>
+            <div className="h-1 w-1 rounded-full bg-[#00E5FF]"></div>
             <div className="h-[1px] w-8 bg-gray-200 dark:bg-gray-800"></div>
           </div>
           <p className="text-lg max-w-2xl mx-auto opacity-70 leading-relaxed">
@@ -156,7 +156,7 @@ const About = () => {
                 }`}
               >
                 <div className="mb-6">
-                  <value.icon className={`h-8 w-8 ${darkMode ? 'text-[#3F96FC]' : 'text-[#3F96FC]'} opacity-80`} />
+                  <value.icon className={`h-8 w-8 ${darkMode ? 'text-[#00E5FF]' : 'text-[#00E5FF]'} opacity-80`} />
                 </div>
                 <h3 className={`text-sm font-medium tracking-wide uppercase mb-3 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                   {value.title}
@@ -183,7 +183,7 @@ const About = () => {
                   </span>
                 </div>
                 <h3 className={`text-base font-medium ${darkMode ? 'text-white' : 'text-gray-900'}`}>{person.name}</h3>
-                <p className="text-xs text-[#3F96FC] font-medium tracking-widest uppercase mt-1 mb-4">{person.role}</p>
+                <p className="text-xs text-[#00E5FF] font-medium tracking-widest uppercase mt-1 mb-4">{person.role}</p>
                 <p className="text-sm opacity-60 italic leading-relaxed">"{person.bio}"</p>
               </div>
             ))}
@@ -235,7 +235,7 @@ const About = () => {
 
         {/* CTA */}
         <div className={`rounded-3xl p-16 text-center shadow-2xl relative overflow-hidden ${darkMode ? 'bg-[#1E1E1E]' : 'bg-[#37383F]'}`}>
-          <div className="absolute top-0 right-0 w-64 h-64 bg-[#3F96FC]/10 rounded-full blur-[100px] -mr-32 -mt-32"></div>
+          <div className="absolute top-0 right-0 w-64 h-64 bg-[#00E5FF]/10 rounded-full blur-[100px] -mr-32 -mt-32"></div>
           <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#FF854D]/5 rounded-full blur-[100px] -ml-32 -mb-32"></div>
           
           <h2 className="text-3xl font-light tracking-tighter text-white mb-6">
@@ -247,7 +247,7 @@ const About = () => {
           <div className="flex flex-col sm:flex-row justify-center gap-4 relative z-10">
             <Link
               to="/shop"
-              className="px-10 py-3 rounded-full bg-[#3F96FC] text-white text-xs tracking-[0.2em] font-medium hover:bg-[#2679e9] transition-all"
+              className="px-10 py-3 rounded-full bg-[#00E5FF] text-white text-xs tracking-[0.2em] font-medium hover:bg-[#2679e9] transition-all"
             >
               VER CATÁLOGO
             </Link>

@@ -504,7 +504,7 @@ export default function Shop() {
 
     return (
       <div className="mb-4 border-b border-gray-100 dark:border-gray-800 pb-4 last:border-0">
-        <div className="flex items-center gap-3 mb-2 text-[#3F96FC]">
+        <div className="flex items-center gap-3 mb-2 text-[#00E5FF]">
           <category.icon className="h-4 w-4" />
           <h3 className="text-[10px] font-light tracking-[0.2em] uppercase opacity-70">{category.name}</h3>
         </div>
@@ -518,8 +518,8 @@ export default function Shop() {
                 onClick={() => handleCategoryChange(sub.name)}
                 className={`block w-full text-left px-3 py-1.5 rounded-full text-xs transition-colors ${
                   selectedCategory === sub.name
-                    ? 'bg-gray-100 text-[#3F96FC] dark:bg-gray-800 dark:text-[#3F96FC]'
-                    : 'text-gray-500 dark:text-gray-400 font-light hover:text-[#3F96FC]'
+                    ? 'bg-gray-100 text-[#00E5FF] dark:bg-gray-800 dark:text-[#00E5FF]'
+                    : 'text-gray-500 dark:text-gray-400 font-light hover:text-[#00E5FF]'
                 }`}
               >
                 {sub.name}
@@ -567,9 +567,9 @@ export default function Shop() {
                   placeholder="¿Qué estás buscando en la tienda?"
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 bg-gray-50 dark:bg-[#0f0f14] border-gray-100 dark:border-white/10 text-sm font-light text-gray-900 dark:text-white rounded-full focus:border-[#3F96FC] dark:focus:ring-[#3F96FC]/30 transition-all outline-none"
+                  className="w-full pl-10 pr-4 py-2.5 bg-gray-50 dark:bg-[#0f0f14] border-gray-100 dark:border-white/10 text-sm font-light text-gray-900 dark:text-white rounded-full focus:border-[#00E5FF] dark:focus:ring-[#00E5FF]/30 transition-all outline-none"
                 />
-                <MagnifyingGlassIcon className="h-4 w-4 text-gray-400 dark:text-[#3F96FC]/50 absolute left-3.5 top-3.5" />
+                <MagnifyingGlassIcon className="h-4 w-4 text-gray-400 dark:text-[#00E5FF]/50 absolute left-3.5 top-3.5" />
                 <button type="submit" className="hidden">Buscar</button>
               </form>
 
@@ -578,7 +578,7 @@ export default function Shop() {
                 <div className="absolute top-full left-0 mt-2 w-full rounded-2xl bg-white dark:bg-[#1f1f23] shadow-2xl border border-gray-100 dark:border-white/10 overflow-hidden z-[100] transform transition-all animate-fadeIn">
                   {isLoadingSuggestions ? (
                     <div className="p-4 text-center">
-                      <div className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-solid border-[#3F96FC] border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"></div>
+                      <div className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-solid border-[#00E5FF] border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"></div>
                       <span className="ml-3 text-[10px] tracking-widest text-gray-400 uppercase">Buscando...</span>
                     </div>
                   ) : (
@@ -594,7 +594,7 @@ export default function Shop() {
                           </div>
                           <div className="ml-3 overflow-hidden">
                             <p className="text-sm font-medium text-black dark:text-white truncate">{product.name}</p>
-                            <p className="text-[10px] text-[#3F96FC] font-medium tracking-wide">{formatPrice(product.price)}</p>
+                            <p className="text-[10px] text-[#00E5FF] font-medium tracking-wide">{formatPrice(product.price)}</p>
                           </div>
                         </button>
                       ))}
@@ -616,7 +616,7 @@ export default function Shop() {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="bg-white dark:bg-[#0a0a0f] border border-gray-100 dark:border-white/10 px-5 py-2.5 rounded-full text-xs font-light text-gray-600 dark:text-gray-400 focus:border-[#3F96FC] outline-none transition-all"
+                className="bg-white dark:bg-[#0a0a0f] border border-gray-100 dark:border-white/10 px-5 py-2.5 rounded-full text-xs font-light text-gray-600 dark:text-gray-400 focus:border-[#00E5FF] outline-none transition-all"
               >
                 <option value="newest">Más recientes</option>
                 <option value="price_asc">Precio: Menor a Mayor</option>
@@ -672,7 +672,7 @@ export default function Shop() {
             
             <div className="grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-3 xl:gap-x-8">
               {products.map((product) => (
-                <div key={product.id} className="group relative bg-white dark:bg-[#0f0f14] rounded-3xl shadow-md overflow-hidden hover:shadow-xl dark:hover:shadow-[#3F96FC]/10 transition-all duration-500 border border-transparent dark:border-white/5">
+                <div key={product.id} className="group relative bg-white dark:bg-[#0f0f14] rounded-3xl shadow-md overflow-hidden hover:shadow-xl dark:hover:shadow-[#00E5FF]/10 transition-all duration-500 border border-transparent dark:border-white/5">
                   {/* Badge de descuento */}
                   {product.discount > 0 && (
                     <div className="absolute top-4 right-4 bg-[#FF854D] text-white text-[10px] px-3 py-1.5 rounded-full font-light tracking-wider z-10">
@@ -695,7 +695,7 @@ export default function Shop() {
                     />
                   </div>
                   <div className="mt-4 px-4 pb-4">
-                    <h3 className="text-sm font-medium text-gray-900 dark:text-white group-hover:text-[#3F96FC] transition-colors line-clamp-2">
+                    <h3 className="text-sm font-medium text-gray-900 dark:text-white group-hover:text-[#00E5FF] transition-colors line-clamp-2">
                       <Link to={`/product/${product.id}`}>
                         {product.name}
                       </Link>

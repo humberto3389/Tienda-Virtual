@@ -132,7 +132,7 @@ const Contact = () => {
           {/* Email */}
           <div className="bg-[#F5F5F7] dark:bg-[#111] rounded-[2rem] p-8 hover:scale-[1.02] transition-transform duration-500">
             <div className="flex items-center space-x-4">
-              <div className="p-3 rounded-full bg-white dark:bg-black text-[#3F96FC]">
+              <div className="p-3 rounded-full bg-white dark:bg-black text-[#00E5FF]">
                 <EnvelopeIcon className="h-5 w-5" />
               </div>
               <div>
@@ -147,7 +147,7 @@ const Contact = () => {
           {/* Phone */}
           <div className="bg-[#F5F5F7] dark:bg-[#111] rounded-[2rem] p-8 hover:scale-[1.02] transition-transform duration-500">
             <div className="flex items-center space-x-4">
-              <div className="p-3 rounded-full bg-white dark:bg-black text-[#3F96FC]">
+              <div className="p-3 rounded-full bg-white dark:bg-black text-[#00E5FF]">
                 <PhoneIcon className="h-5 w-5" />
               </div>
               <div>
@@ -162,7 +162,7 @@ const Contact = () => {
           {/* Location */}
           <div className="bg-[#F5F5F7] dark:bg-[#111] rounded-[2rem] p-8 hover:scale-[1.02] transition-transform duration-500">
             <div className="flex items-center space-x-4">
-              <div className="p-3 rounded-full bg-white dark:bg-black text-[#3F96FC]">
+              <div className="p-3 rounded-full bg-white dark:bg-black text-[#00E5FF]">
                 <MapPinIcon className="h-5 w-5" />
               </div>
               <div>
@@ -177,7 +177,7 @@ const Contact = () => {
           {/* Hours */}
           <div className="bg-[#F5F5F7] dark:bg-[#111] rounded-[2rem] p-8 hover:scale-[1.02] transition-transform duration-500">
             <div className="flex items-center space-x-4">
-              <div className="p-3 rounded-full bg-white dark:bg-black text-[#3F96FC]">
+              <div className="p-3 rounded-full bg-white dark:bg-black text-[#00E5FF]">
                 <ClockIcon className="h-5 w-5" />
               </div>
               <div>
@@ -197,7 +197,7 @@ const Contact = () => {
           {/* Form */}
           <div className="p-10 lg:p-14 rounded-[2.5rem] bg-[#F5F5F7] dark:bg-[#111]">
             <div className="flex items-center space-x-4 mb-10">
-              <div className="p-3 rounded-full bg-white dark:bg-black text-[#3F96FC]">
+              <div className="p-3 rounded-full bg-white dark:bg-black text-[#00E5FF]">
                 <ChatBubbleLeftRightIcon className="h-6 w-6" />
               </div>
               <h2 className="text-2xl font-light tracking-tighter text-black dark:text-white">Envíanos un mensaje</h2>
@@ -250,7 +250,7 @@ const Contact = () => {
                         value={formData.name}
                         onChange={handleChange}
                         required
-                        className="w-full px-5 py-3 rounded-full bg-gray-50 dark:bg-gray-800/50 border-gray-100 dark:border-gray-700 text-sm font-light text-gray-900 dark:text-white focus:border-[#3F96FC] outline-none transition-colors"
+                        className="w-full px-5 py-3 rounded-full bg-gray-50 dark:bg-gray-800/50 border-gray-100 dark:border-gray-700 text-sm font-light text-gray-900 dark:text-white focus:border-[#00E5FF] outline-none transition-colors"
                       />
                     </div>
                     <div>
@@ -261,7 +261,7 @@ const Contact = () => {
                         value={formData.email}
                         onChange={handleChange}
                         required
-                        className="w-full px-5 py-3 rounded-full bg-gray-50 dark:bg-gray-800/50 border-gray-100 dark:border-gray-700 text-sm font-light text-gray-900 dark:text-white focus:border-[#3F96FC] outline-none transition-colors"
+                        className="w-full px-5 py-3 rounded-full bg-gray-50 dark:bg-gray-800/50 border-gray-100 dark:border-gray-700 text-sm font-light text-gray-900 dark:text-white focus:border-[#00E5FF] outline-none transition-colors"
                       />
                     </div>
                   </div>
@@ -274,7 +274,7 @@ const Contact = () => {
                       value={formData.subject}
                       onChange={handleChange}
                       required
-                      className="w-full px-5 py-3 rounded-full bg-gray-50 dark:bg-gray-800/50 border-gray-100 dark:border-gray-700 text-sm font-light text-gray-900 dark:text-white focus:border-[#3F96FC] outline-none transition-colors"
+                      className="w-full px-5 py-3 rounded-full bg-gray-50 dark:bg-gray-800/50 border-gray-100 dark:border-gray-700 text-sm font-light text-gray-900 dark:text-white focus:border-[#00E5FF] outline-none transition-colors"
                     />
                   </div>
 
@@ -286,7 +286,7 @@ const Contact = () => {
                       value={formData.message}
                       onChange={handleChange}
                       required
-                      className="w-full px-5 py-4 rounded-3xl bg-gray-50 dark:bg-gray-800/50 border-gray-100 dark:border-gray-700 text-sm font-light text-gray-900 dark:text-white focus:border-[#3F96FC] outline-none transition-colors resize-none"
+                      className="w-full px-5 py-4 rounded-3xl bg-gray-50 dark:bg-gray-800/50 border-gray-100 dark:border-gray-700 text-sm font-light text-gray-900 dark:text-white focus:border-[#00E5FF] outline-none transition-colors resize-none"
                     />
                   </div>
 

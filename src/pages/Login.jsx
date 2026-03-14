@@ -64,7 +64,7 @@ export default function Login() {
               onClick={() => setActiveTab('email')}
               className={`flex-1 py-4 px-6 text-center font-light tracking-[0.2em] uppercase text-[10px] transition-all duration-300 ${
                 activeTab === 'email'
-                  ? 'text-[#3F96FC] border-b-2 border-[#3F96FC]'
+                  ? 'text-[#00E5FF] border-b-2 border-[#00E5FF]'
                   : 'text-gray-400 hover:text-gray-600'
               }`}
             >
@@ -74,7 +74,7 @@ export default function Login() {
               onClick={() => setActiveTab('google')}
               className={`flex-1 py-4 px-6 flex items-center justify-center transition-all duration-300 border-b-2 ${
                 activeTab === 'google'
-                  ? 'border-[#3F96FC]'
+                  ? 'border-[#00E5FF]'
                   : 'border-transparent'
               }`}
             >
@@ -93,7 +93,7 @@ export default function Login() {
               </h1>
               <div className="flex items-center justify-center space-x-2">
                 <div className="h-[1px] w-4 bg-gray-200 dark:bg-gray-800"></div>
-                <div className="h-1 w-1 rounded-full bg-[#3F96FC]"></div>
+                <div className="h-1 w-1 rounded-full bg-[#00E5FF]"></div>
                 <div className="h-[1px] w-4 bg-gray-200 dark:bg-gray-800"></div>
               </div>
             </div>
@@ -111,8 +111,8 @@ export default function Login() {
                       onChange={(e) => setEmail(e.target.value)}
                       className={`w-full px-6 py-4 rounded-full text-sm font-light border outline-none transition-all ${
                         darkMode 
-                          ? 'bg-gray-800/50 border-gray-700 text-white focus:border-[#3F96FC]' 
-                          : 'bg-gray-50 border-gray-100 text-gray-900 focus:border-[#3F96FC]'
+                          ? 'bg-gray-800/50 border-gray-700 text-white focus:border-[#00E5FF]' 
+                          : 'bg-gray-50 border-gray-100 text-gray-900 focus:border-[#00E5FF]'
                       }`}
                       placeholder="tu@email.com"
                       required
@@ -130,8 +130,8 @@ export default function Login() {
                         onChange={(e) => setPassword(e.target.value)}
                         className={`w-full px-6 py-4 rounded-full text-sm font-light border outline-none transition-all ${
                           darkMode 
-                            ? 'bg-gray-800/50 border-gray-700 text-white focus:border-[#3F96FC]' 
-                            : 'bg-gray-50 border-gray-100 text-gray-900 focus:border-[#3F96FC]'
+                            ? 'bg-gray-800/50 border-gray-700 text-white focus:border-[#00E5FF]' 
+                            : 'bg-gray-50 border-gray-100 text-gray-900 focus:border-[#00E5FF]'
                         }`}
                         placeholder="••••••••"
                         required
@@ -156,7 +156,7 @@ export default function Login() {
                     <input
                       id="remember-me"
                       type="checkbox"
-                      className="h-3 w-3 text-[#3F96FC] focus:ring-[#3F96FC] border-gray-300 rounded-full"
+                      className="h-3 w-3 text-[#00E5FF] focus:ring-[#00E5FF] border-gray-300 rounded-full"
                     />
                     <label htmlFor="remember-me" className="ml-2 block text-[10px] uppercase tracking-widest opacity-40">
                       Recordarme
@@ -165,7 +165,7 @@ export default function Login() {
 
                   <Link
                     to="/forgot-password"
-                    className="text-[10px] uppercase tracking-widest text-[#3F96FC] hover:underline"
+                    className="text-[10px] uppercase tracking-widest text-[#00E5FF] hover:underline"
                   >
                     ¿Olvidaste tu contraseña?
                   </Link>
@@ -217,7 +217,7 @@ export default function Login() {
 
                 <button
                   onClick={() => setActiveTab('email')}
-                  className="w-full text-center text-[10px] tracking-widest uppercase text-[#3F96FC] hover:underline"
+                  className="w-full text-center text-[10px] tracking-widest uppercase text-[#00E5FF] hover:underline"
                 >
                   VOLVER AL FORMULARIO
                 </button>
@@ -228,7 +228,7 @@ export default function Login() {
               <p className="text-[10px] tracking-widest uppercase opacity-40 mb-3">¿No tienes una cuenta?</p>
               <Link
                 to="/register"
-                className="text-xs font-medium text-[#3F96FC] hover:underline tracking-widest uppercase"
+                className="text-xs font-medium text-[#00E5FF] hover:underline tracking-widest uppercase"
               >
                 Regístrate aquí
               </Link>

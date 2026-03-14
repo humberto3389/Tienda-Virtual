@@ -117,10 +117,10 @@ export default function ServicioDetalle() {
           </Link>
           
           <div className="flex items-center space-x-4 mb-4">
-            <div className="p-3 bg-[#3F96FC] rounded-2xl shadow-lg shadow-[#3F96FC]/20">
+            <div className="p-3 bg-[#00E5FF] rounded-2xl shadow-lg shadow-[#00E5FF]/20">
               <IconComponent className="h-8 w-8 text-white" />
             </div>
-            <span className="text-[#3F96FC] font-bold tracking-widest text-sm uppercase">Soluciones YERSIMAN</span>
+            <span className="text-[#00E5FF] font-bold tracking-widest text-sm uppercase">Soluciones YERSIMAN</span>
           </div>
           
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-white tracking-tight mb-6 max-w-3xl leading-tight">
@@ -142,7 +142,7 @@ export default function ServicioDetalle() {
             {/* Qué incluye */}
             <section>
               <h2 className="text-2xl font-bold mb-8 flex items-center">
-                <CheckCircleIcon className="h-7 w-7 text-[#3F96FC] mr-3" />
+                <CheckCircleIcon className="h-7 w-7 text-[#00E5FF] mr-3" />
                 Lo que incluye el servicio
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -152,7 +152,7 @@ export default function ServicioDetalle() {
                     className={`flex items-start space-x-3 p-5 rounded-2xl border ${darkMode ? 'bg-gray-800/40 border-gray-700/50 hover:bg-gray-800/80' : 'bg-white border-gray-200 hover:shadow-md'} transition-all`}
                   >
                     <div className="mt-1 flex-shrink-0">
-                      <div className="w-2 h-2 rounded-full bg-[#3F96FC]"></div>
+                      <div className="w-2 h-2 rounded-full bg-[#00E5FF]"></div>
                     </div>
                     <span className={`font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                       {item}
@@ -165,16 +165,16 @@ export default function ServicioDetalle() {
             {/* Beneficios */}
             <section>
               <h2 className="text-2xl font-bold mb-8 flex items-center">
-                <TrophyIcon className="h-7 w-7 text-[#3F96FC] mr-3" />
+                <TrophyIcon className="h-7 w-7 text-[#00E5FF] mr-3" />
                 Beneficios Directos
               </h2>
               <div className="space-y-4">
                 {servicio.benefits && servicio.benefits.map((beneficio, index) => (
                   <div 
                     key={index} 
-                    className={`flex items-center space-x-4 p-4 rounded-xl border-l-4 border-[#3F96FC] ${darkMode ? 'bg-gray-800/30' : 'bg-blue-50/50'}`}
+                    className={`flex items-center space-x-4 p-4 rounded-xl border-l-4 border-[#00E5FF] ${darkMode ? 'bg-gray-800/30' : 'bg-blue-50/50'}`}
                   >
-                    <CheckCircleIcon className="h-6 w-6 text-[#3F96FC]" />
+                    <CheckCircleIcon className="h-6 w-6 text-[#00E5FF]" />
                     <span className={`font-medium ${darkMode ? 'text-gray-200' : 'text-gray-800'}`}>
                       {beneficio}
                     </span>
@@ -192,7 +192,7 @@ export default function ServicioDetalle() {
               <div className="mb-8">
                 <p className="text-sm font-semibold uppercase tracking-wider text-gray-500 mb-2">Precio de Evaluación</p>
                 <div className="flex items-end">
-                  <h3 className="text-4xl font-black text-[#3F96FC]">
+                  <h3 className="text-4xl font-black text-[#00E5FF]">
                     {servicio.precio}
                   </h3>
                 </div>
@@ -204,7 +204,7 @@ export default function ServicioDetalle() {
               <div className="space-y-4">
                 <button 
                   onClick={handleWhatsAppClick}
-                  className="w-full py-4 px-6 rounded-2xl bg-[#3F96FC] hover:bg-[#2e7dda] text-white font-bold text-lg shadow-lg shadow-[#3F96FC]/30 flex items-center justify-center transition-all transform hover:scale-[1.02] active:scale-[0.98]"
+                  className="w-full py-4 px-6 rounded-2xl bg-[#00E5FF] hover:bg-[#2e7dda] text-white font-bold text-lg shadow-lg shadow-[#00E5FF]/30 flex items-center justify-center transition-all transform hover:scale-[1.02] active:scale-[0.98]"
                 >
                   <ChatBubbleLeftRightIcon className="h-6 w-6 mr-2" />
                   Solicitar por WhatsApp

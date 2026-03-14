@@ -9,7 +9,7 @@ export default function VerifyEmail() {
     <div className={`min-h-screen flex items-center justify-center p-4 ${darkMode ? 'bg-[#121212]' : 'bg-white'}`}>
       <div className="max-w-md w-full text-center">
         <div className={`inline-flex items-center justify-center w-20 h-20 rounded-full mb-8 ${darkMode ? 'bg-gray-800' : 'bg-gray-50'}`}>
-          <EnvelopeIcon className="h-10 w-10 text-[#3F96FC]" />
+          <EnvelopeIcon className="h-10 w-10 text-[#00E5FF]" />
         </div>
         
         <h1 className={`text-3xl font-light tracking-tighter mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
@@ -44,7 +44,7 @@ export default function VerifyEmail() {
         </div>
 
         <p className="mt-12 text-[10px] tracking-widest uppercase opacity-30">
-          ¿No recibiste el correo? <button className="text-[#3F96FC] hover:underline">Reenviar</button>
+          ¿No recibiste el correo? <button className="text-[#00E5FF] hover:underline">Reenviar</button>
         </p>
       </div>
     </div>

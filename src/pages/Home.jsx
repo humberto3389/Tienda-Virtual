@@ -199,11 +199,11 @@ const Home = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#0a0a0f] selection:bg-[#3F96FC]/30 transition-colors duration-700">
+    <div className="min-h-screen bg-white dark:bg-[#0a0a0f] selection:bg-[#00E5FF]/30 transition-colors duration-700">
       {/* 1. MONUMENTAL HERO */}
       <section className="relative h-screen min-h-[800px] flex items-center justify-center overflow-hidden">
         {/* Magic Glow Orbs for Dark Mode */}
-        <div className="absolute top-1/4 -left-20 w-[500px] h-[500px] bg-[#3F96FC]/10 blur-[150px] rounded-full pointer-events-none dark:block hidden animate-pulse"></div>
+        <div className="absolute top-1/4 -left-20 w-[500px] h-[500px] bg-[#00E5FF]/10 blur-[150px] rounded-full pointer-events-none dark:block hidden animate-pulse"></div>
         <div className="absolute bottom-1/4 -right-20 w-[500px] h-[500px] bg-[#FF854D]/10 blur-[150px] rounded-full pointer-events-none dark:block hidden animate-pulse" style={{animationDelay: '1s'}}></div>
         {/* Abstract Background / Parallax Feel */}
         <div className="absolute inset-0 z-0">
@@ -229,7 +229,7 @@ const Home = () => {
             <div className="w-full h-full bg-stone-100 dark:bg-[#050508] animate-pulse"></div>
           )}
           <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-white dark:to-[#0a0a0f]"></div>
-          <div className="absolute inset-0 bg-gradient-to-tr from-[#3F96FC]/5 via-transparent to-[#FF854D]/5 dark:block hidden"></div>
+          <div className="absolute inset-0 bg-gradient-to-tr from-[#00E5FF]/5 via-transparent to-[#FF854D]/5 dark:block hidden"></div>
         </div>
 
         <div className="relative z-10 text-center px-4 max-w-5xl mx-auto mt-20">
@@ -240,7 +240,7 @@ const Home = () => {
             <span className="block opacity-90 animate-fade-in-up" style={{animationDelay: '0.1s'}}>
               {heroData?.title_primary || 'Piensa'}
             </span>
-            <span className="block font-medium bg-gradient-to-r from-[#3F96FC] to-[#FF854D] bg-clip-text text-transparent animate-fade-in-up" style={{animationDelay: '0.2s'}}>
+            <span className="block font-medium bg-gradient-to-r from-[#00E5FF] to-[#FF854D] bg-clip-text text-transparent animate-fade-in-up" style={{animationDelay: '0.2s'}}>
               {heroData?.title_secondary || 'Diferente.'}
             </span>
           </h1>
@@ -296,7 +296,7 @@ const Home = () => {
         <div className="container mx-auto px-6 md:px-12 lg:px-24">
           <div className="mb-32 md:mb-48 md:text-center">
             <h2 className="text-5xl md:text-7xl font-light text-black dark:text-white tracking-tighter">
-              Lo Mejor <span className="font-semibold bg-gradient-to-r from-[#3F96FC] to-[#FF854D] bg-clip-text text-transparent">de la Tecnología.</span>
+              Lo Mejor <span className="font-semibold bg-gradient-to-r from-[#00E5FF] to-[#FF854D] bg-clip-text text-transparent">de la Tecnología.</span>
             </h2>
             <p className="mt-6 text-xl text-gray-500 font-light tracking-wide max-w-2xl md:mx-auto">
               Cada pieza seleccionada representa el pináculo de la ingeniería moderna y el diseño estético.
@@ -326,7 +326,7 @@ const Home = () => {
                       <div className="absolute inset-0 shadow-[inset_0_0_120px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_0_120px_rgba(0,0,0,0.4)] pointer-events-none transition-opacity duration-1000 group-hover:opacity-100 opacity-60"></div>
 
                       {/* Overlay sutil para oscurecer ligerísimamente en hover y mostrar contraste */}
-                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 dark:group-hover:bg-[#3F96FC]/5 transition-colors duration-[2s] ease-[cubic-bezier(0.25,1,0.5,1)]"></div>
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 dark:group-hover:bg-[#00E5FF]/5 transition-colors duration-[2s] ease-[cubic-bezier(0.25,1,0.5,1)]"></div>
 
                       {product.discount > 0 && (
                         <span className="absolute top-10 left-10 px-6 py-3 bg-black/80 backdrop-blur-md text-white text-[11px] tracking-[0.2em] rounded-full drop-shadow-2xl">
@@ -386,7 +386,7 @@ const Home = () => {
         <section className="py-32 bg-[#F5F5F7] dark:bg-[#050508] border-y border-gray-200/50 dark:border-white/5 transition-colors duration-500">
           <div className="container mx-auto px-6 max-w-7xl">
             <div className="text-center mb-20">
-              <span className="text-[10px] tracking-[0.4em] font-medium text-[#3F96FC] uppercase block mb-4">
+              <span className="text-[10px] tracking-[0.4em] font-medium text-[#00E5FF] uppercase block mb-4">
                 Testimonios Reales
               </span>
               <h2 className="text-4xl md:text-5xl font-light text-black dark:text-white tracking-tighter">
@@ -398,9 +398,9 @@ const Home = () => {
               {destacadas.slice(0, 3).map((opinion) => (
                 <div 
                   key={opinion.id} 
-                  className="group relative bg-white dark:bg-[#0f0f14] p-10 rounded-[2.5rem] border border-gray-100 dark:border-white/5 shadow-sm hover:shadow-2xl hover:shadow-black/5 dark:hover:shadow-[#3F96FC]/5 transition-all duration-500 flex flex-col h-full overflow-hidden"
+                  className="group relative bg-white dark:bg-[#0f0f14] p-10 rounded-[2.5rem] border border-gray-100 dark:border-white/5 shadow-sm hover:shadow-2xl hover:shadow-black/5 dark:hover:shadow-[#00E5FF]/5 transition-all duration-500 flex flex-col h-full overflow-hidden"
                 >
-                  <div className="absolute -top-24 -right-24 w-48 h-48 bg-[#3F96FC]/5 blur-[60px] rounded-full group-hover:bg-[#3F96FC]/10 transition-colors"></div>
+                  <div className="absolute -top-24 -right-24 w-48 h-48 bg-[#00E5FF]/5 blur-[60px] rounded-full group-hover:bg-[#00E5FF]/10 transition-colors"></div>
                   <div className="flex items-center gap-1 mb-6">
                     {[...Array(5)].map((_, i) => (
                       <StarIconSolid 
@@ -457,7 +457,7 @@ const Home = () => {
       <section className="py-40 bg-white dark:bg-[#0a0a0f] transition-colors duration-500">
         <div className="container mx-auto px-6 max-w-2xl text-center">
           <h2 className="text-4xl md:text-5xl font-light text-black dark:text-white tracking-tighter mb-6">
-            <span className="font-semibold bg-gradient-to-r from-[#3F96FC] to-[#FF854D] bg-clip-text text-transparent">Únete a la Vanguardia.</span>
+            <span className="font-semibold bg-gradient-to-r from-[#00E5FF] to-[#FF854D] bg-clip-text text-transparent">Únete a la Vanguardia.</span>
           </h2>
           <p className="text-gray-500 font-light mb-16 tracking-wide text-lg">
             Ingresa tu correo para recibir acceso anticipado a colaboraciones exclusivas y nuevos lanzamientos de diseño.
@@ -482,7 +482,7 @@ const Home = () => {
             </button>
           </form>
           {subscriptionMessage.text && (
-            <p className={`mt-8 text-xs font-medium tracking-[0.1em] uppercase ${subscriptionMessage.type === 'error' ? 'text-[#FF854D]' : 'text-[#3F96FC]'}`}>
+            <p className={`mt-8 text-xs font-medium tracking-[0.1em] uppercase ${subscriptionMessage.type === 'error' ? 'text-[#FF854D]' : 'text-[#00E5FF]'}`}>
               {subscriptionMessage.text}
             </p>
           )}

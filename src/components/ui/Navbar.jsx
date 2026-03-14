@@ -109,7 +109,7 @@ const Navbar = () => {
   return (
     <header className={`sticky top-0 z-50 transition-all duration-500 ${scrolled ? 'py-1' : 'py-3'}`}>
       <div className={`absolute inset-0 transition-colors duration-500 ${scrolled ? 'bg-white/80 dark:bg-[#0a0a0f]/80 backdrop-blur-2xl' : 'bg-transparent'}`}></div>
-      <div className={`absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-gray-200/50 dark:via-[#3F96FC]/20 to-transparent transition-opacity duration-500 ${scrolled ? 'opacity-100' : 'opacity-0'}`}></div>
+      <div className={`absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-gray-200/50 dark:via-[#00E5FF]/20 to-transparent transition-opacity duration-500 ${scrolled ? 'opacity-100' : 'opacity-0'}`}></div>
 
       <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16 rounded-full bg-transparent">
@@ -122,14 +122,14 @@ const Navbar = () => {
             <div className="hidden xl:flex flex-col">
               <span className="text-xl tracking-tighter text-gray-900 dark:text-white transition-colors duration-300">
                 <span className="font-light">Yer</span>
-                <span className="font-medium text-[#3F96FC]">siman</span>
+                <span className="font-medium text-[#00E5FF]">siman</span>
               </span>
             </div>
           </Link>
 
           {/* Desktop Navigation */}
           <nav className="hidden xl:flex h-full items-center justify-center flex-1 mx-4">
-            <div className="flex items-center space-x-1 xl:space-x-2 bg-white/40 dark:bg-white/5 backdrop-blur-xl px-2 py-1.5 rounded-full border border-gray-200/50 dark:border-white/10 shadow-sm dark:shadow-[#3F96FC]/5">
+            <div className="flex items-center space-x-1 xl:space-x-2 bg-white/40 dark:bg-white/5 backdrop-blur-xl px-2 py-1.5 rounded-full border border-gray-200/50 dark:border-white/10 shadow-sm dark:shadow-[#00E5FF]/5">
               {navItems.map((item) => (
                 <div
                   key={item.path}
@@ -140,8 +140,8 @@ const Navbar = () => {
                   <Link
                     to={item.path}
                     className={`px-5 py-2 rounded-full text-[11px] font-medium tracking-[0.2em] transition-all duration-300 uppercase ${hoveredItem === item.path
-                      ? 'bg-[#3F96FC] text-white shadow-lg shadow-[#3F96FC]/20'
-                      : 'text-gray-500 dark:text-gray-400 hover:text-[#3F96FC] dark:hover:text-[#3F96FC]'
+                      ? 'bg-[#00E5FF] text-white shadow-lg shadow-[#00E5FF]/20'
+                      : 'text-gray-500 dark:text-gray-400 hover:text-[#00E5FF] dark:hover:text-[#00E5FF]'
                       }`}
                   >
                     {item.name}
@@ -161,7 +161,7 @@ const Navbar = () => {
             <div className="relative search-menu">
               <button
                 onClick={toggleSearch}
-                className={`p-2.5 rounded-full transition-all duration-300 ${searchOpen ? 'bg-black text-white dark:bg-white dark:text-black' : 'text-gray-500 dark:text-gray-400 hover:text-[#3F96FC] dark:hover:text-[#3F96FC] hover:bg-blue-50 dark:hover:bg-[#3F96FC]/10'}`}
+                className={`p-2.5 rounded-full transition-all duration-300 ${searchOpen ? 'bg-black text-white dark:bg-white dark:text-black' : 'text-gray-500 dark:text-gray-400 hover:text-[#00E5FF] dark:hover:text-[#00E5FF] hover:bg-blue-50 dark:hover:bg-[#00E5FF]/10'}`}
               >
                 <MagnifyingGlassIcon className={`h-5 w-5 ${searchOpen ? 'transform rotate-90 opacity-0 absolute' : 'transform rotate-0 opacity-100 transition-all duration-300'}`} />
                 <XMarkIcon className={`h-5 w-5 ${searchOpen ? 'transform rotate-0 opacity-100 transition-all duration-300' : 'transform -rotate-90 opacity-0 absolute'}`} />
@@ -176,9 +176,9 @@ const Navbar = () => {
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Buscar productos..."
                     autoFocus={searchOpen}
-                    className="w-full bg-gray-50 dark:bg-[#050508] border-none rounded-2xl text-sm font-light tracking-wide text-black dark:text-white px-5 py-4 focus:ring-2 focus:ring-[#3F96FC]/50 transition-all"
+                    className="w-full bg-gray-50 dark:bg-[#050508] border-none rounded-2xl text-sm font-light tracking-wide text-black dark:text-white px-5 py-4 focus:ring-2 focus:ring-[#00E5FF]/50 transition-all"
                   />
-                  <button type="submit" className="absolute right-4 top-1/2 -translate-y-1/2 p-2 text-gray-400 hover:text-[#3F96FC] transition-colors">
+                  <button type="submit" className="absolute right-4 top-1/2 -translate-y-1/2 p-2 text-gray-400 hover:text-[#00E5FF] transition-colors">
                     <MagnifyingGlassIcon className="h-5 w-5" />
                   </button>
                 </form>
@@ -188,7 +188,7 @@ const Navbar = () => {
                   <div className="border-t border-gray-100 dark:border-white/5 max-h-80 overflow-y-auto">
                     {isLoadingSuggestions ? (
                       <div className="p-4 text-center">
-                        <div className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-solid border-[#3F96FC] border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"></div>
+                        <div className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-solid border-[#00E5FF] border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"></div>
                         <span className="ml-3 text-[10px] tracking-widest text-gray-400 uppercase">Buscando...</span>
                       </div>
                     ) : (
@@ -204,7 +204,7 @@ const Navbar = () => {
                             </div>
                             <div className="ml-3 overflow-hidden">
                               <p className="text-sm font-medium text-black dark:text-white truncate">{product.name}</p>
-                              <p className="text-[10px] text-[#3F96FC] font-medium tracking-wide">{formatPrice(product.price)}</p>
+                              <p className="text-[10px] text-[#00E5FF] font-medium tracking-wide">{formatPrice(product.price)}</p>
                             </div>
                           </button>
                         ))}
@@ -329,9 +329,9 @@ const Navbar = () => {
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="¿Qué estás buscando?"
                     autoFocus={searchOpen}
-                    className="w-full bg-gray-50/50 dark:bg-[#111] border-none rounded-2xl text-base font-light tracking-wide text-black dark:text-white px-5 py-4 focus:ring-2 focus:ring-[#3F96FC]/50 transition-all"
+                    className="w-full bg-gray-50/50 dark:bg-[#111] border-none rounded-2xl text-base font-light tracking-wide text-black dark:text-white px-5 py-4 focus:ring-2 focus:ring-[#00E5FF]/50 transition-all"
                   />
-                  <button type="submit" className="absolute right-6 top-1/2 -translate-y-1/2 p-2 text-gray-400 hover:text-[#3F96FC] transition-colors">
+                  <button type="submit" className="absolute right-6 top-1/2 -translate-y-1/2 p-2 text-gray-400 hover:text-[#00E5FF] transition-colors">
                     <MagnifyingGlassIcon className="h-5 w-5" />
                   </button>
                 </form>
@@ -341,7 +341,7 @@ const Navbar = () => {
                   <div className="border-t border-gray-100 dark:border-white/5 max-h-[60vh] overflow-y-auto">
                     {isLoadingSuggestions ? (
                       <div className="p-8 text-center">
-                        <div className="inline-block h-5 w-5 animate-spin rounded-full border-2 border-solid border-[#3F96FC] border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"></div>
+                        <div className="inline-block h-5 w-5 animate-spin rounded-full border-2 border-solid border-[#00E5FF] border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"></div>
                         <p className="mt-3 text-[10px] tracking-[0.2em] text-gray-400 uppercase font-medium">Buscando productos...</p>
                       </div>
                     ) : (
@@ -361,7 +361,7 @@ const Navbar = () => {
                             <div className="ml-4 overflow-hidden flex-1">
                               <p className="text-sm font-medium text-black dark:text-white truncate">{product.name}</p>
                               <div className="flex items-center mt-0.5">
-                                <p className="text-[11px] text-[#3F96FC] font-semibold tracking-wide">{formatPrice(product.price)}</p>
+                                <p className="text-[11px] text-[#00E5FF] font-semibold tracking-wide">{formatPrice(product.price)}</p>
                                 {product.discount > 0 && (
                                   <span className="ml-2 text-[9px] text-orange-500 font-bold bg-orange-50 dark:bg-orange-500/10 px-1.5 py-0.5 rounded uppercase">-{product.discount}%</span>
                                 )}
@@ -398,7 +398,7 @@ const Navbar = () => {
       >
         <div className="flex flex-col p-8 h-full overflow-y-auto relative">
           {/* Subtle background glow for mobile menu */}
-          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-64 h-64 bg-[#3F96FC]/10 blur-[120px] rounded-full pointer-events-none dark:block hidden"></div>
+          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-64 h-64 bg-[#00E5FF]/10 blur-[120px] rounded-full pointer-events-none dark:block hidden"></div>
 
           <div className="flex flex-col space-y-4 mt-4 text-center">
             {navItems.map((item) => (
@@ -406,7 +406,7 @@ const Navbar = () => {
                 key={item.path}
                 to={item.path}
                 onClick={toggleMenu}
-                className={`text-lg md:text-xl font-light tracking-widest uppercase transition-colors ${item.highlight ? 'text-[#FF854D] font-medium' : 'text-gray-600 dark:text-gray-300 hover:text-[#3F96FC] dark:hover:text-[#3F96FC]'}`}
+                className={`text-lg md:text-xl font-light tracking-widest uppercase transition-colors ${item.highlight ? 'text-[#FF854D] font-medium' : 'text-gray-600 dark:text-gray-300 hover:text-[#00E5FF] dark:hover:text-[#00E5FF]'}`}
               >
                 {item.name}
               </Link>
@@ -435,7 +435,7 @@ const Navbar = () => {
                 </div>
 
                 {profile?.role === 'admin' ? (
-                  <Link to="/admin/dashboard" onClick={toggleMenu} className="text-sm font-light tracking-widest text-[#3F96FC] uppercase">Panel Admin</Link>
+                  <Link to="/admin/dashboard" onClick={toggleMenu} className="text-sm font-light tracking-widest text-[#00E5FF] uppercase">Panel Admin</Link>
                 ) : (
                   <Link to="/profile" onClick={toggleMenu} className="text-sm font-light tracking-widest text-black dark:text-white uppercase">Mi Perfil</Link>
                 )}
