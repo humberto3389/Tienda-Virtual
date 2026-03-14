@@ -78,7 +78,18 @@ const Home = () => {
   const [loadingCategories, setLoadingCategories] = useState(true);
   const { theme } = useTheme();
 
-  const [heroData, setHeroData] = useState(null);
+  const defaultHero = {
+    title_primary: 'Piensa',
+    title_secondary: 'Diferente.',
+    subtitle: 'La innovación más avanzada en tus manos. Diseño sin concesiones, rendimiento absoluto.',
+    badge: 'Nueva Era Tecnológica',
+    button_primary_text: 'DESCUBRIR COLECCIÓN',
+    button_primary_url: '/shop',
+    media_url: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop",
+    media_type: 'image'
+  };
+
+  const [heroData, setHeroData] = useState(defaultHero);
   const [loadingHero, setLoadingHero] = useState(true);
 
   // Cargar datos del Hero
@@ -86,7 +97,7 @@ const Home = () => {
     const fetchHero = async () => {
       try {
         const result = await homeService.getHeroData();
-        if (result.success) {
+        if (result.success && result.data) {
           setHeroData(result.data);
         }
       } catch (error) {
@@ -207,10 +218,10 @@ const Home = () => {
         <div className="absolute bottom-1/4 -right-20 w-[500px] h-[500px] bg-[#FF854D]/10 blur-[150px] rounded-full pointer-events-none md:block hidden animate-pulse" style={{animationDelay: '1s'}}></div>
         {/* Abstract Background / Parallax Feel */}
         <div className="absolute inset-0 z-0">
-          {!loadingHero && heroData && (
-            heroData.media_type === 'video' ? (
+          {(heroData || defaultHero) && (
+            (heroData?.media_type || defaultHero.media_type) === 'video' ? (
               <video
-                src={heroData.media_url}
+                src={heroData?.media_url || defaultHero.media_url}
                 autoPlay
                 loop
                 muted
@@ -220,15 +231,12 @@ const Home = () => {
               />
             ) : (
               <img
-                src={`${heroData.media_url || "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop"}&w=${window.innerWidth > 768 ? 1920 : 800}&q=80`}
+                src={`${(heroData?.media_url || defaultHero.media_url).includes('?') ? (heroData?.media_url || defaultHero.media_url) : (heroData?.media_url || defaultHero.media_url) + '?auto=format&fit=crop'}&w=${window.innerWidth > 768 ? 1920 : 800}&q=80`}
                 alt="Hero background"
                 fetchpriority="high"
                 className="w-full h-full object-cover opacity-[0.85] dark:opacity-50 object-center transform scale-105"
               />
             )
-          )}
-          {loadingHero && (
-            <div className="w-full h-full bg-stone-100 dark:bg-[#050508] animate-pulse"></div>
           )}
           <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-white dark:to-[#0a0a0f]"></div>
           <div className="absolute inset-0 bg-gradient-to-tr from-[#00E5FF]/5 via-transparent to-[#FF854D]/5 dark:block hidden"></div>
